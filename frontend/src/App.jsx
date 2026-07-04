@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 const Login = lazy(() => import('./pages/Login'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 
 const AppContext = createContext(null);
 
@@ -77,6 +78,18 @@ export default function App() {
               element={
                 user ? (
                   <Dashboard />
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              } 
+            />
+            <Route 
+              path="/admin" 
+              element={
+                user && user.role === 'HR' ? (
+                  <AdminDashboard />
+                ) : user ? (
+                  <Navigate to="/dashboard" replace />
                 ) : (
                   <Navigate to="/" replace />
                 )

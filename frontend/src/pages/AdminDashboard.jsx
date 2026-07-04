@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useAdminApp } from '../App';
+import { useApp } from '../App';
 import { useNavigate } from 'react-router-dom';
 import { Users, Calendar, Clock, DollarSign, LogOut } from 'lucide-react';
 
 import EmployeeDirectory from '../components/EmployeeDirectory';
 import EditEmployeeModal from '../components/EditEmployeeModal';
-import EmployeeDetailView from '../components/EmployeeDetailView';
+import EmployeeDetailView from '../components/AdminEmployeeDetailView';
 import AttendanceGrid from '../components/AttendanceGrid';
 import ManualAttendanceModal from '../components/ManualAttendanceModal';
 import LeaveReviewTable from '../components/LeaveReviewTable';
@@ -13,7 +13,7 @@ import PayrollRegistry from '../components/PayrollRegistry';
 import SalaryModal from '../components/SalaryModal';
 
 export default function AdminDashboard() {
-  const { admin, logout, showToast } = useAdminApp();
+  const { user, logout, showToast } = useApp();
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState('tab-directory');
@@ -251,7 +251,7 @@ export default function AdminDashboard() {
         <div className="flex items-center gap-4">
           <span className="flex items-center gap-2 rounded-full border border-purple-500/20 bg-purple-500/5 px-3 py-1.5 text-xs font-semibold text-purple-400">
             <span className="h-2 w-2 rounded-full bg-purple-500 animate-pulse" />
-            {admin?.name || 'HR Officer'}
+            {user?.name || 'HR Officer'}
           </span>
           <button onClick={() => logout(navigate)} className="rounded-lg border border-white/5 bg-white/5 p-2 text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-all" title="Sign Out">
             <LogOut className="h-4 w-4" />
@@ -266,9 +266,9 @@ export default function AdminDashboard() {
         <aside className="flex flex-col gap-6">
           <div className="glass-panel flex flex-col gap-0.5">
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Console Authority</span>
-            <div className="font-display font-bold text-white text-base mt-1">{admin?.name || 'HR Administrator'}</div>
-            <p className="text-xs text-indigo-400 font-mono font-bold mt-1">ID: {admin?.loginId || 'HR-001'}</p>
-            <div className="text-xs text-slate-400 mt-0.5 truncate">{admin?.email}</div>
+            <div className="font-display font-bold text-white text-base mt-1">{user?.name || 'HR Administrator'}</div>
+            <p className="text-xs text-indigo-400 font-mono font-bold mt-1">ID: {user?.loginId || 'HR-001'}</p>
+            <div className="text-xs text-slate-400 mt-0.5 truncate">{user?.email}</div>
           </div>
 
           <nav className="glass-panel flex flex-col gap-1 p-2">

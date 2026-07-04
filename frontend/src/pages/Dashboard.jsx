@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../App';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Calendar, User, FileText, Clock, LogOut, Camera } from 'lucide-react';
 
 import ClockPanel from '../components/ClockPanel';
@@ -317,12 +317,12 @@ export default function Dashboard() {
 
         <div className="flex items-center gap-4">
           {profileData?.role === 'HR' && (
-            <a 
-              href={window.location.hostname === 'localhost' ? 'http://localhost:5174/' : '/admin/'}
+            <Link 
+              to="/admin"
               className="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-all flex items-center gap-1 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1.5 rounded-lg"
             >
               Admin Console ➜
-            </a>
+            </Link>
           )}
           <div className="relative flex items-center gap-2">
             {/* Status dot in header: Green if checked in, Red if checked out */}

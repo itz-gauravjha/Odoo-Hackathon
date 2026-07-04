@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useApp } from '../App';
 import { Shield, Mail, Lock, User as UserIcon, Eye, EyeOff, Building } from 'lucide-react';
 
@@ -203,7 +203,7 @@ export default function Login() {
             {dbStatus === 'online' ? 'Database Online' :
              dbStatus === 'offline' ? 'Database Offline (Dev Mode)' : 'Server Offline'}
           </span>
-          <a href={window.location.hostname === 'localhost' ? 'http://localhost:5174/' : '/admin/'} className="text-xs font-bold text-indigo-400 hover:underline">HR Console ➜</a>
+          <Link to="/admin" className="text-xs font-bold text-indigo-400 hover:underline">HR Console ➜</Link>
         </div>
       </header>
 

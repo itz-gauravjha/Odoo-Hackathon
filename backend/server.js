@@ -53,32 +53,19 @@ app.use('/api/attendance', require('./routes/attendance'));
 app.use('/api/leave', require('./routes/leave'));
 app.use('/api/payroll', require('./routes/payroll'));
 
-// Production setup: serve React build folders statically if they exist
-const adminBuildPath = path.join(__dirname, '..', 'admin', 'dist');
+// Production setup: serve React build folder statically if it exists
 const frontendBuildPath = path.join(__dirname, '..', 'frontend', 'dist');
 
-// Serve Admin Console statically under /admin
-app.use('/admin', express.static(adminBuildPath));
-
-// Serve Employee Portal statically under root /
+// Serve Employee & Admin Portal statically under root /
 app.use(express.static(frontendBuildPath));
 
-// Fallback all /admin/* router paths to admin index.html
-app.get('/admin/*', (req, res) => {
-  res.sendFile(path.join(adminBuildPath, 'index.html'), (err) => {
-    if (err) {
-      res.status(404).send('Admin console build is not available.');
-    }
-  });
-});
-
-// Fallback all other client-side router paths to employee index.html
+// Fallback all client-side router paths to frontend index.html
 app.get('*', (req, res) => {
   res.sendFile(path.join(frontendBuildPath, 'index.html'), (err) => {
     if (err) {
       res.status(200).json({ 
         message: "HRMS Backend API is online.",
-        status: "Development Mode (Vite dev servers handle frontend ports)"
+        status: "Development Mode (Vite dev server handles client ports)"
       });
     }
   });

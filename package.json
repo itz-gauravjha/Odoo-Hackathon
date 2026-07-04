@@ -7,10 +7,9 @@
     "start": "node backend/server.js",
     "backend": "nodemon backend/server.js",
     "frontend": "npm run dev --prefix frontend",
-    "admin": "npm run dev --prefix admin",
-    "dev": "concurrently \"npm run backend\" \"npm run frontend\" \"npm run admin\"",
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
     "seed": "node backend/seed.js",
-    "build": "npm install --include=dev --prefix frontend && npm install --include=dev --prefix admin && npm install --prefix backend && npm run build --prefix frontend && npm run build --prefix admin"
+    "build": "npm install --include=dev --prefix frontend && npm install --prefix backend && npm run build --prefix frontend"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
