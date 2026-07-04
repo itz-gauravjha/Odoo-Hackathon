@@ -151,9 +151,7 @@ router.post('/signup', async (req, res) => {
     res.status(201).json({ 
       success: true, 
       message: `Registration successful! A verification OTP code has been sent to ${email}.`,
-      loginId,
-      otpDevOnly: otp,
-      verificationLinkDevOnly: verifyLink
+      loginId
     });
   } catch (error) {
     console.error('Signup error:', error);
@@ -296,8 +294,7 @@ router.post('/signin', async (req, res) => {
         message: 'Account not verified. Please enter the OTP sent to your email to verify.',
         notVerified: true,
         email: user.email,
-        loginId: user.loginId,
-        otpDevOnly: user.verificationToken
+        loginId: user.loginId
       });
     }
 
