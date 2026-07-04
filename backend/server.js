@@ -8,6 +8,9 @@ const connectDB = require('./db');
 
 const app = express();
 
+// Trust Render's reverse proxy so secure cookies work on HTTPS
+app.set('trust proxy', 1);
+
 // Connect to MongoDB (non-crashing connection helper)
 connectDB();
 
@@ -22,7 +25,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    maxAge: 1000 * 60 * 60 * 24,
+    maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     secure: process.env.NODE_ENV === 'production'
   }
