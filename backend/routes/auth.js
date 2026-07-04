@@ -5,19 +5,19 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const User = require('../models/User');
 
-const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: false,
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-    },
-    connectionTimeout: 30000,
-    greetingTimeout: 30000,
-    socketTimeout: 30000
-});
+const nodemailer = require("nodemailer");
 
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+  logger: true,
+  debug: true,
+});
 const isPasswordSecure = (password) => {
   return password.length >= 6 && /[A-Za-z]/.test(password) && /[0-9]/.test(password);
 };
@@ -70,7 +70,7 @@ const generateLoginId = async (name, companyName) => {
 
 // @route   POST /api/auth/signup
 router.post('/signup', async (req, res) => {
-  console.log(process.env.SMTP_USER,"\n",process.env.SMTP_PASS)
+ 
   const host = req.get('host');
   const protocol = req.get('x-forwarded-proto') || req.protocol || 'http';
 
