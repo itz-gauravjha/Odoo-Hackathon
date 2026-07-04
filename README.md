@@ -2,7 +2,7 @@
 
 > A full-stack, production-ready Human Resource Management System built for the **Odoo Hackathon**. Features dual portals (Employee + HR Admin), real-time attendance tracking, leave management, payroll slips, email OTP verification, and one-click Render deployment.
 
-**🌐 Live Demo:** https://odoo-hackathon-1wcv.onrender.com  
+**🌐 Live Demo:** [odoo-hackathon-1wcv.onrender.com](https://odoo-hackathon-1wcv.onrender.com)  
 **👤 Employee Portal:** `/`  
 **🛡️ HR Admin Console:** `/admin/`
 
@@ -48,56 +48,56 @@
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Interactive Directory Structure & Key Files
 
-```
-school management/
-├── backend/                  # Express.js API Server
-│   ├── models/
-│   │   ├── User.js           # Employee schema (profile, salary, resume fields)
-│   │   ├── Attendance.js     # Check-in/out records
-│   │   └── LeaveRequest.js   # Leave request schema
-│   ├── routes/
-│   │   ├── auth.js           # Signup, Signin, OTP verify, Signout
-│   │   ├── employee.js       # Profile CRUD, Employee list
-│   │   ├── attendance.js     # Check-in, Check-out, Logs
-│   │   ├── leave.js          # Apply leave, List, Admin approve/reject
-│   │   └── payroll.js        # Salary slip generation
-│   ├── middleware/
-│   │   └── auth.js           # requireAuth, requireHR guards
-│   ├── db.js                 # MongoDB Atlas connection with auto /hrms DB injection
-│   ├── server.js             # Express app, static serving, session config
-│   └── seed.js               # Demo data seeder
-│
-├── frontend/                 # Employee Portal (React + Vite)
-│   └── src/
-│       ├── pages/
-│       │   ├── Login.jsx     # Sign in / Sign up / OTP verify
-│       │   └── Dashboard.jsx # Main portal (Directory, Attendance, Leave, Profile, Payroll)
-│       └── components/
-│           ├── EmployeeDirectory.jsx   # Colleague cards with status dots
-│           ├── EmployeeDetailView.jsx  # View/edit profile modal (view-only for others)
-│           ├── ClockPanel.jsx          # Check-in / Check-out widget
-│           ├── AttendanceCalendar.jsx  # Monthly attendance heatmap
-│           ├── LeaveForm.jsx           # Leave request form
-│           ├── LeaveHistoryTable.jsx   # Leave history list
-│           ├── ProfileView.jsx         # Profile display
-│           ├── ProfileEditForm.jsx     # Profile edit form
-│           └── PayrollSlip.jsx         # Salary slip component
-│
-├── admin/                    # HR Admin Console (React + Vite)
-│   └── src/
-│       ├── pages/
-│       │   ├── AdminLogin.jsx      # HR-only login page
-│       │   └── AdminDashboard.jsx  # Full HR control panel
-│       └── components/
-│           ├── EmployeeDirectory.jsx   # Clickable employee cards
-│           └── EmployeeDetailView.jsx  # Full editor with salary config
-│
-├── package.json              # Root build scripts for Render
-├── render_deployment_guide.md
-└── README.md
-```
+Click any file to open it directly in the workspace:
+
+- 📂 [school-management](file:///c:/Users/Imran%20Hussain/Desktop/school%20management)
+  - 📂 **[backend](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend)** — Express.js API Server
+    - 📂 **[models](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/models)** — Database Schemas
+      - 📄 [User.js](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/models/User.js) — Employee profile, authentication details, and salary configuration
+      - 📄 [Attendance.js](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/models/Attendance.js) — Daily clock-in/out logs
+      - 📄 [LeaveRequest.js](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/models/LeaveRequest.js) — Employee leave applications
+    - 📂 **[routes](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/routes)** — API Controllers
+      - 📄 [auth.js](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/routes/auth.js) — User signup, signin, OTP generation, and email alerts
+      - 📄 [employee.js](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/routes/employee.js) — Employee profiles CRUD & directories list
+      - 📄 [attendance.js](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/routes/attendance.js) — Clocking status and monthly calendars
+      - 📄 [leave.js](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/routes/leave.js) — Leave requests processing and approvals
+      - 📄 [payroll.js](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/routes/payroll.js) — Payslip builder backend
+    - 📂 **[middleware](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/middleware)** — Guards
+      - 📄 [auth.js](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/middleware/auth.js) — Authentication check & Role verification guards
+    - 📄 [db.js](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/db.js) — Mongoose database connection controller with database name injection
+    - 📄 [server.js](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/server.js) — Main backend entrypoint, static assets hosting, and proxy settings
+    - 📄 [seed.js](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/seed.js) — Local database seeder script
+  - 📂 **[frontend](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend)** — Employee Portal (React + Vite)
+    - 📂 **[src/pages](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/pages)** — Views
+      - 📄 [Login.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/pages/Login.jsx) — User account creation, signing in, and email confirmation
+      - 📄 [Dashboard.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/pages/Dashboard.jsx) — Core user control panel
+    - 📂 **[src/components](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components)** — Components
+      - 📄 [AttendanceCalendar.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/AttendanceCalendar.jsx) — Attendance logs calendar heatmap
+      - 📄 [ClockPanel.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/ClockPanel.jsx) — Interactive clocking switch
+      - 📄 [EmployeeDetailView.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/EmployeeDetailView.jsx) — Detail profile modal with view-only protection
+      - 📄 [EmployeeDirectory.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/EmployeeDirectory.jsx) — List of team members with presence status indicators
+      - 📄 [LeaveForm.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/LeaveForm.jsx) — Leave applications creator
+      - 📄 [LeaveHistoryTable.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/LeaveHistoryTable.jsx) — Submitted requests log
+      - 📄 [ProfileView.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/ProfileView.jsx) — Summary view of own details
+      - 📄 [ProfileEditForm.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/ProfileEditForm.jsx) — Form to update profile details
+      - 📄 [PayrollSlip.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/PayrollSlip.jsx) — Printable salary breakdown card
+  - 📂 **[admin](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin)** — HR Admin Console (React + Vite)
+    - 📂 **[src/pages](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin/src/pages)** — Views
+      - 📄 [AdminLogin.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin/src/pages/AdminLogin.jsx) — Secure gateway for HR users
+      - 📄 [AdminDashboard.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin/src/pages/AdminDashboard.jsx) — Full overview dashboard for HR operations
+    - 📂 **[src/components](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin/src/components)** — Controls
+      - 📄 [AttendanceGrid.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin/src/components/AttendanceGrid.jsx) — Real-time attendance grid for HR audit
+      - 📄 [EditEmployeeModal.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin/src/components/EditEmployeeModal.jsx) — Admin employee details config window
+      - 📄 [EmployeeDetailView.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin/src/components/EmployeeDetailView.jsx) — Multi-tab editor for profile, settings, and wage
+      - 📄 [EmployeeDirectory.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin/src/components/EmployeeDirectory.jsx) — Employee roster search
+      - 📄 [LeaveReviewTable.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin/src/components/LeaveReviewTable.jsx) — Action buttons to approve/reject requests
+      - 📄 [ManualAttendanceModal.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin/src/components/ManualAttendanceModal.jsx) — Tool to retroactively override attendance
+      - 📄 [PayrollRegistry.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin/src/components/PayrollRegistry.jsx) — Registry of payslips by employee
+      - 📄 [SalaryModal.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin/src/components/SalaryModal.jsx) — Quick editor for monthly payroll values
+  - 📄 [package.json](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/package.json) — Monorepo commands configuration
+  - 📄 [render_deployment_guide.md](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/render_deployment_guide.md) — Render deployment guide
 
 ---
 
