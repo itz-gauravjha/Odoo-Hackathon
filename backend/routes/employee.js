@@ -72,7 +72,7 @@ router.get('/list', requireAuth, async (req, res) => {
   try {
     const User = require('../models/User');
     const Attendance = require('../models/Attendance');
-    const Leave = require('../models/Leave');
+    const LeaveRequest = require('../models/LeaveRequest');
 
     const employees = await User.find({}).select('-password').sort({ name: 1 }).lean();
     
@@ -87,7 +87,7 @@ router.get('/list', requireAuth, async (req, res) => {
       date: { $gte: todayStart, $lte: todayEnd }
     });
 
-    const todayLeaves = await Leave.find({
+    const todayLeaves = await LeaveRequest.find({
       status: 'Approved',
       startDate: { $lte: todayEnd },
       endDate: { $gte: todayStart }

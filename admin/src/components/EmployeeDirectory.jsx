@@ -2,7 +2,7 @@ import React from 'react';
 import { Plane, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function EmployeeDirectory({ employees, onSelectEmployee, defaultAvatar }) {
-  
+
   const getEmployeeStatus = (emp) => {
     return emp.todayStatus || 'absent';
   };
@@ -20,8 +20,8 @@ export default function EmployeeDirectory({ employees, onSelectEmployee, default
           const status = getEmployeeStatus(emp);
 
           return (
-            <div 
-              key={emp._id} 
+            <div
+              key={emp._id}
               onClick={() => onSelectEmployee(emp)}
               className="glass-panel-interactive flex flex-col justify-between cursor-pointer hover:border-indigo-500/40 hover:shadow-lg hover:shadow-indigo-500/5 transition-all relative group"
             >
@@ -47,12 +47,11 @@ export default function EmployeeDirectory({ employees, onSelectEmployee, default
 
                 {/* Avatar and name */}
                 <div className="flex items-center gap-3 pb-3 border-b border-white/5">
-                  <img 
-                    src={emp.profilePicture || defaultAvatar} 
-                    alt="Avatar" 
-                    className={`h-11 w-11 rounded-full object-cover bg-slate-900 border ${
-                      isHr ? 'border-purple-500/30 animate-pulse' : 'border-indigo-500/30'
-                    }`} 
+                  <img
+                    src={emp.profilePicture || defaultAvatar}
+                    alt="Avatar"
+                    className={`h-11 w-11 rounded-full object-cover bg-slate-900 border ${isHr ? 'border-purple-500/30 animate-pulse' : 'border-indigo-500/30'
+                      }`}
                   />
                   <div>
                     <h4 className="font-semibold text-sm text-slate-200 leading-none group-hover:text-indigo-400 transition-colors">{emp.name}</h4>
@@ -71,12 +70,11 @@ export default function EmployeeDirectory({ employees, onSelectEmployee, default
 
               {/* Card Footer */}
               <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
-                <span className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ${
-                  isHr ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' : 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20'
-                }`}>
+                <span className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ${isHr ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' : 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20'
+                  }`}>
                   {emp.role}
                 </span>
-                
+
                 <span className="text-[10px] font-semibold text-indigo-400 group-hover:underline">
                   View Profile ➜
                 </span>
