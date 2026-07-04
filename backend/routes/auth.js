@@ -293,8 +293,10 @@ router.post('/signin', async (req, res) => {
 
     if (!user.isVerified) {
       return res.status(401).json({ 
-        message: 'Account not verified. Please check server console for verification link.',
-        notVerified: true 
+        message: 'Account not verified. Please enter the OTP sent to your email to verify.',
+        notVerified: true,
+        email: user.email,
+        loginId: user.loginId
       });
     }
 

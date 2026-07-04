@@ -78,6 +78,13 @@ export default function Login() {
       const data = await res.json();
 
       if (!res.ok) {
+        if (res.status === 401 && data.notVerified) {
+          setRegisteredEmail(data.email);
+          setGeneratedLoginId(data.loginId);
+          setShowDevVerify(true);
+          showToast(data.message, 'info');
+          return;
+        }
         throw new Error(data.message || 'Login failed');
       }
 
