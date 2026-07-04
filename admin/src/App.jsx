@@ -37,10 +37,7 @@ export default function App() {
         if (data.user.role === 'HR') {
           setAdmin(data.user);
         } else {
-          showToast('Access denied. Redirecting to employee portal...', 'error');
-          setTimeout(() => {
-            window.location.href = 'http://localhost:5173/';
-          }, 1500);
+          setAdmin(null);
         }
       } else {
         setAdmin(null);
