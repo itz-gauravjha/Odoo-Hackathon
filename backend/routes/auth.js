@@ -154,8 +154,12 @@ router.post('/signup', async (req, res) => {
       `
     };
 
-    console.log(`[SMTP]: Starting background email send to ${email}...`);
-    transporter.sendMail(mailOptions)
+    try {
+      const info = await transporter.sendMail(mailOptions);
+      console.log("Email sent successfully:", info.response);
+    } catch (err) {
+      console.error("Email sending failed:", err);
+    }
     console.log('======================================================\n');
 
     res.status(201).json({
