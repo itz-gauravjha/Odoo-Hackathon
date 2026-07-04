@@ -58,7 +58,7 @@ export default function Dashboard() {
 
   const fetchEmployees = async () => {
     try {
-      const res = await fetch('/api/employee/list');
+      const res = await fetch('/api/employee/list', { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
         setEmployees(data);
@@ -70,7 +70,7 @@ export default function Dashboard() {
 
   const fetchProfile = async () => {
     try {
-      const res = await fetch('/api/employee/profile');
+      const res = await fetch('/api/employee/profile', { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
         setProfileData(data);
@@ -84,7 +84,7 @@ export default function Dashboard() {
 
   const fetchTodayAttendance = async () => {
     try {
-      const res = await fetch('/api/attendance/today');
+      const res = await fetch('/api/attendance/today', { credentials: 'include' });
       const data = await res.json();
       if (data.success) setTodayRecord(data.record);
     } catch (err) {
@@ -94,7 +94,7 @@ export default function Dashboard() {
 
   const fetchLogs = async () => {
     try {
-      const res = await fetch('/api/attendance/my-logs');
+      const res = await fetch('/api/attendance/my-logs', { credentials: 'include' });
       const data = await res.json();
       if (data.success) setAttendanceLogs(data.logs);
     } catch (err) {
@@ -104,7 +104,7 @@ export default function Dashboard() {
 
   const fetchLeaves = async () => {
     try {
-      const res = await fetch('/api/leave/my-requests');
+      const res = await fetch('/api/leave/my-requests', { credentials: 'include' });
       const data = await res.json();
       if (data.success) setLeaveRequests(data.requests);
     } catch (err) {
@@ -114,7 +114,7 @@ export default function Dashboard() {
 
   const fetchPaySlip = async () => {
     try {
-      const res = await fetch('/api/payroll/my-slip');
+      const res = await fetch('/api/payroll/my-slip', { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
         if (data.success) setPayrollSlip(data.salaryStructure);
@@ -126,7 +126,7 @@ export default function Dashboard() {
 
   const handleCheckIn = async () => {
     try {
-      const res = await fetch('/api/attendance/checkin', { method: 'POST' });
+      const res = await fetch('/api/attendance/checkin', { method: 'POST', credentials: 'include' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
       
@@ -140,7 +140,7 @@ export default function Dashboard() {
 
   const handleCheckOut = async () => {
     try {
-      const res = await fetch('/api/attendance/checkout', { method: 'POST' });
+      const res = await fetch('/api/attendance/checkout', { method: 'POST', credentials: 'include' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
       
@@ -157,6 +157,7 @@ export default function Dashboard() {
     try {
       const res = await fetch('/api/leave/apply', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           leaveType,
@@ -187,6 +188,7 @@ export default function Dashboard() {
     try {
       const res = await fetch('/api/employee/profile', {
         method: 'PUT',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, address })
       });
@@ -215,6 +217,7 @@ export default function Dashboard() {
       try {
         const res = await fetch('/api/employee/profile', {
           method: 'PUT',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ profilePicture: base64Data })
         });
