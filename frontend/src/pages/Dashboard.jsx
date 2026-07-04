@@ -1,0 +1,385 @@
+import React, { useState, useEffect } from 'react';
+import { useApp } from '../App';
+import { useNavigate } from 'react-router-dom';
+import { Calendar, User, FileText, Clock, LogOut, Camera } from 'lucide-react';
+
+import ClockPanel from '../components/ClockPanel';
+import AttendanceCalendar from '../components/AttendanceCalendar';
+import LeaveForm from '../components/LeaveForm';
+import LeaveHistoryTable from '../components/LeaveHistoryTable';
+import ProfileView from '../components/ProfileView';
+import ProfileEditForm from '../components/ProfileEditForm';
+import PayrollSlip from '../components/PayrollSlip';
+
+export default function Dashboard() {
+  const { user, logout, showToast } = useApp();
+  const navigate = useNavigate();
+
+  const [activeTab, setActiveTab] = useState('tab-attendance');
+  const [profileData, setProfileData] = useState(null);
+  
+  // Today's Checkin Record
+  const [todayRecord, setTodayRecord] = useState(null);
+  // Attendance Logs
+  const [attendanceLogs, setAttendanceLogs] = useState([]);
+  
+  // Leave Form parameters
+  const [leaveType, setLeaveType] = useState('Paid');
+  const [startDateStr, setStartDateStr] = useState('');
+  const [endDateStr, setEndDateStr] = useState('');
+  const [leaveRemarks, setLeaveRemarks] = useState('');
+  const [leaveRequests, setLeaveRequests] = useState([]);
+
+  // Calendar Click States
+  const [selectedStart, setSelectedStart] = useState(null);
+  const [selectedEnd, setSelectedEnd] = useState(null);
+
+  // Profile Edit fields
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+
+  // Payroll Slip fields
+  const [payrollSlip, setPayrollSlip] = useState(null);
+
+  useEffect(() => {
+    fetchProfile();
+    fetchTodayAttendance();
+    fetchLogs();
+    fetchLeaves();
+    fetchPaySlip();
+  }, []);
+
+  const fetchProfile = async () => {
+    try {
+      const res = await fetch('/api/employee/profile');
+      if (res.ok) {
+        const data = await res.json();
+        setProfileData(data);
+        setPhone(data.phone || '');
+        setAddress(data.address || '');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchTodayAttendance = async () => {
+    try {
+      const res = await fetch('/api/attendance/today');
+      const data = await res.json();
+      if (data.success) setTodayRecord(data.record);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchLogs = async () => {
+    try {
+      const res = await fetch('/api/attendance/my-logs');
+      const data = await res.json();
+      if (data.success) setAttendanceLogs(data.logs);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchLeaves = async () => {
+    try {
+      const res = await fetch('/api/leave/my-requests');
+      const data = await res.json();
+      if (data.success) setLeaveRequests(data.requests);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchPaySlip = async () => {
+    try {
+      const res = await fetch('/api/payroll/my-slip');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) setPayrollSlip(data.salaryStructure);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleCheckIn = async () => {
+    try {
+      const res = await fetch('/api/attendance/checkin', { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      
+      showToast(data.message, 'success');
+      await fetchTodayAttendance();
+      await fetchLogs();
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  };
+
+  const handleCheckOut = async () => {
+    try {
+      const res = await fetch('/api/attendance/checkout', { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      
+      showToast(data.message, 'success');
+      await fetchTodayAttendance();
+      await fetchLogs();
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  };
+
+  const handleLeaveApply = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('/api/leave/apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          leaveType,
+          startDate: startDateStr,
+          endDate: endDateStr,
+          remarks: leaveRemarks
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      showToast(data.message, 'success');
+      setLeaveRemarks('');
+      setStartDateStr('');
+      setEndDateStr('');
+      setSelectedStart(null);
+      setSelectedEnd(null);
+      
+      await fetchLeaves();
+      await fetchLogs();
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  };
+
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('/api/employee/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, address })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      showToast(data.message, 'success');
+      await fetchProfile();
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  };
+
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      showToast('Profile image must be under 2MB', 'error');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64Data = reader.result;
+      try {
+        const res = await fetch('/api/employee/profile', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ profilePicture: base64Data })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+
+        showToast('Profile picture uploaded successfully', 'success');
+        await fetchProfile();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const getFormattedDateInput = (dateObj) => {
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const handleSelectRange = (clickedDate) => {
+    const dateStr = getFormattedDateInput(clickedDate);
+
+    if (!selectedStart || (selectedStart && selectedEnd)) {
+      setSelectedStart(clickedDate);
+      setSelectedEnd(null);
+      setStartDateStr(dateStr);
+      setEndDateStr('');
+      showToast(`Selected start date: ${dateStr}`, 'info');
+    } else {
+      if (clickedDate < selectedStart) {
+        setSelectedStart(clickedDate);
+        setStartDateStr(dateStr);
+        showToast(`Updated start date: ${dateStr}`, 'info');
+      } else {
+        setSelectedEnd(clickedDate);
+        setEndDateStr(dateStr);
+        showToast(`Selected end date: ${dateStr}`, 'info');
+      }
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  const defaultAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='%236366f1'><circle cx='50' cy='35' r='20'/><path d='M20,80 C20,60 80,60 80,80'/></svg>";
+  const avatarSrc = (profileData && profileData.profilePicture) || defaultAvatar;
+
+  return (
+    <div className="flex min-h-screen flex-col bg-midnight">
+      {/* Navbar */}
+      <header className="flex items-center justify-between border-b border-white/5 bg-slate-950/80 px-8 py-4 backdrop-blur-md sticky top-0 z-50">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 font-extrabold text-sm shadow-md shadow-indigo-500/20">H</div>
+          <span className="font-display font-bold tracking-tight text-white">HRMS Employee Portal</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="flex items-center gap-2 rounded-full border border-white/5 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-300">
+            <span className="h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
+            {profileData?.name || 'Loading...'}
+          </span>
+          <button onClick={() => logout(navigate)} className="rounded-lg border border-white/5 bg-white/5 p-2 text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-all" title="Sign Out">
+            <LogOut className="h-4 w-4" />
+          </button>
+        </div>
+      </header>
+
+      {/* Grid */}
+      <div className="mx-auto grid w-full max-w-7xl gap-8 p-8 md:grid-cols-[280px_1fr]">
+        
+        {/* Sidebar */}
+        <aside className="flex flex-col gap-6">
+          <div className="glass-panel flex flex-col items-center text-center gap-3">
+            <div className="relative h-24 w-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 p-0.5 shadow-lg shadow-indigo-500/25">
+              <img src={avatarSrc} alt="Avatar" className="h-full w-full rounded-full object-cover bg-slate-950" />
+              <label htmlFor="avatar-file" className="absolute bottom-0 right-0 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 border-slate-950 bg-indigo-500 text-white shadow hover:scale-105 transition-all">
+                <Camera className="h-3 w-3" />
+              </label>
+              <input type="file" id="avatar-file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
+            </div>
+
+            <div className="mt-2">
+              <h3 className="font-display font-bold text-white text-base leading-tight">{profileData?.name || 'Staff Employee'}</h3>
+              <p className="text-xs text-slate-500 font-mono mt-0.5">ID: {profileData?.loginId || 'EMP-ID'}</p>
+            </div>
+            
+            <span className="rounded-full bg-indigo-500/10 border border-indigo-500/25 px-3 py-1 text-[10px] font-bold text-indigo-400 uppercase tracking-wider">
+              {profileData?.jobTitle || 'Staff Member'}
+            </span>
+          </div>
+
+          <nav className="glass-panel flex flex-col gap-1 p-2">
+            <button onClick={() => setActiveTab('tab-attendance')} className={`flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-semibold tracking-wide transition-all ${
+              activeTab === 'tab-attendance' ? 'bg-indigo-500/10 border-l-2 border-indigo-500 text-white' : 'text-slate-400 hover:bg-white/5 hover:text-white'
+            }`}>
+              <Calendar className="h-4 w-4" />
+              Attendance Tracker
+            </button>
+            <button onClick={() => setActiveTab('tab-leave')} className={`flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-semibold tracking-wide transition-all ${
+              activeTab === 'tab-leave' ? 'bg-indigo-500/10 border-l-2 border-indigo-500 text-white' : 'text-slate-400 hover:bg-white/5 hover:text-white'
+            }`}>
+              <Clock className="h-4 w-4" />
+              Leave Requests
+            </button>
+            <button onClick={() => setActiveTab('tab-profile')} className={`flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-semibold tracking-wide transition-all ${
+              activeTab === 'tab-profile' ? 'bg-indigo-500/10 border-l-2 border-indigo-500 text-white' : 'text-slate-400 hover:bg-white/5 hover:text-white'
+            }`}>
+              <User className="h-4 w-4" />
+              Profile Management
+            </button>
+            <button onClick={() => setActiveTab('tab-payroll')} className={`flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-semibold tracking-wide transition-all ${
+              activeTab === 'tab-payroll' ? 'bg-indigo-500/10 border-l-2 border-indigo-500 text-white' : 'text-slate-400 hover:bg-white/5 hover:text-white'
+            }`}>
+              <FileText className="h-4 w-4" />
+              Payroll Slip
+            </button>
+          </nav>
+        </aside>
+
+        {/* Content area tabs */}
+        <main className="min-w-0">
+          {activeTab === 'tab-attendance' && (
+            <div className="space-y-6">
+              <ClockPanel 
+                todayRecord={todayRecord} 
+                onCheckIn={handleCheckIn} 
+                onCheckOut={handleCheckOut} 
+              />
+              <AttendanceCalendar 
+                logs={attendanceLogs} 
+                onSelectRange={handleSelectRange} 
+                selectedStart={selectedStart} 
+                selectedEnd={selectedEnd} 
+              />
+            </div>
+          )}
+
+          {activeTab === 'tab-leave' && (
+            <div className="grid gap-6 md:grid-cols-[1.2fr_2fr]">
+              <LeaveForm 
+                leaveType={leaveType} 
+                setLeaveType={setLeaveType}
+                startDate={startDateStr} 
+                setStartDate={setStartDateStr}
+                endDate={endDateStr} 
+                setEndDate={setEndDateStr}
+                remarks={leaveRemarks} 
+                setRemarks={setLeaveRemarks}
+                onSubmit={handleLeaveApply}
+              />
+              <LeaveHistoryTable 
+                requests={leaveRequests} 
+                formatDate={formatDate} 
+              />
+            </div>
+          )}
+
+          {activeTab === 'tab-profile' && (
+            <div className="grid gap-6 md:grid-cols-2">
+              <ProfileView 
+                profile={profileData} 
+                formatDate={formatDate} 
+                avatarSrc={avatarSrc} 
+              />
+              <ProfileEditForm 
+                phone={phone} 
+                setPhone={setPhone} 
+                address={address} 
+                setAddress={setAddress} 
+                onSubmit={handleProfileUpdate} 
+              />
+            </div>
+          )}
+
+          {activeTab === 'tab-payroll' && (
+            <PayrollSlip slip={payrollSlip} />
+          )}
+        </main>
+
+      </div>
+    </div>
+  );
+}
