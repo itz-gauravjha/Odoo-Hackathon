@@ -492,12 +492,13 @@ export default function Dashboard() {
         </main>
 
       {showProfileModal && (
-        <EmployeeDetailView 
+              <EmployeeDetailView 
           employee={profileData}
           onClose={() => setShowProfileModal(false)}
           defaultAvatar={defaultAvatar}
           showToast={showToast}
           isAdminView={false}
+          isOwnProfile={true}
           onSaveSuccess={() => {
             fetchProfile();
             setShowProfileModal(false);
@@ -506,12 +507,13 @@ export default function Dashboard() {
       )}
 
       {selectedDetailEmployee && (
-        <EmployeeDetailView 
+                <EmployeeDetailView 
           employee={selectedDetailEmployee}
           onClose={() => setSelectedDetailEmployee(null)}
           defaultAvatar={defaultAvatar}
           showToast={showToast}
           isAdminView={false}
+          isOwnProfile={profileData && selectedDetailEmployee && profileData._id === selectedDetailEmployee._id}
         />
       )}
     </div>

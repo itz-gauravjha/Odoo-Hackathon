@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, Phone, MapPin, User, Building, Award, Briefcase, Plus, X, Edit, Save } from 'lucide-react';
 
-export default function EmployeeDetailView({ employee, onClose, onSaveSuccess, defaultAvatar, showToast, isAdminView = false }) {
+export default function EmployeeDetailView({ employee, onClose, onSaveSuccess, defaultAvatar, showToast, isAdminView = false, isOwnProfile = false }) {
   const [activeTab, setActiveTab] = useState('resume');
   const [isEditing, setIsEditing] = useState(false);
 
@@ -126,7 +126,7 @@ export default function EmployeeDetailView({ employee, onClose, onSaveSuccess, d
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="h-3.5 w-3.5 text-indigo-400" />
-                {isEditing ? (
+                {(isOwnProfile || isAdminView) && isEditing ? (
                   <input type="text" value={mobile} onChange={e => setMobile(e.target.value)} className="w-full bg-slate-900 border border-white/10 rounded px-2 py-0.5 text-xs text-white" placeholder="Mobile" />
                 ) : (
                   <span>{mobile || phone || 'No contact phone'}</span>
@@ -163,21 +163,27 @@ export default function EmployeeDetailView({ employee, onClose, onSaveSuccess, d
             </div>
           </div>
 
-          {/* Edit Actions */}
+          {/* Edit Actions - only for own profile or HR admin */}
           <div className="mt-8 border-t border-white/5 pt-4">
-            {isEditing ? (
-              <div className="flex gap-2">
-                <button onClick={handleSave} className="flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 py-2.5 text-xs font-bold text-white shadow-md shadow-indigo-600/20">
-                  <Save className="h-3.5 w-3.5" /> Save Profile
+            {(isOwnProfile || isAdminView) ? (
+              isEditing ? (
+                <div className="flex gap-2">
+                  <button onClick={handleSave} className="flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 py-2.5 text-xs font-bold text-white shadow-md shadow-indigo-600/20">
+                    <Save className="h-3.5 w-3.5" /> Save Profile
+                  </button>
+                  <button onClick={() => setIsEditing(false)} className="rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 py-2.5 px-4 text-xs font-semibold text-slate-300">
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button onClick={() => setIsEditing(true)} className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-indigo-500/20 bg-indigo-500/5 hover:bg-indigo-500/10 py-2.5 text-xs font-bold text-indigo-400">
+                  <Edit className="h-3.5 w-3.5" /> Update My Details
                 </button>
-                <button onClick={() => setIsEditing(false)} className="rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 py-2.5 px-4 text-xs font-semibold text-slate-300">
-                  Cancel
-                </button>
-              </div>
+              )
             ) : (
-              <button onClick={() => setIsEditing(true)} className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-indigo-500/20 bg-indigo-500/5 hover:bg-indigo-500/10 py-2.5 text-xs font-bold text-indigo-400">
-                <Edit className="h-3.5 w-3.5" /> Update My Details
-              </button>
+              <div className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-white/5 bg-white/5 py-2.5 text-xs font-semibold text-slate-500">
+                👁 View Only
+              </div>
             )}
           </div>
         </div>
