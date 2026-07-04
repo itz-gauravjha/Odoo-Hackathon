@@ -154,23 +154,23 @@ router.post('/signup', async (req, res) => {
       `
     };
 
-    // try {
-    //   await transporter.verify();
-    //   console.log("SMTP Connected");
-    //   const info = await transporter.sendMail(mailOptions);
-    //   console.log("Email sent successfully:", info.response);
-    // } catch (err) {
-    //   console.error("Email sending failed:", err);
-    //   return res.status(400).json({success:false})
-    // }
     try {
-    console.log("Trying to connect to SMTP...");
-    await transporter.verify();
-    console.log("SMTP Connected");
-} catch (err) {
-    console.error("VERIFY ERROR:");
-    console.error(err);
-}
+      await transporter.verify();
+      console.log("SMTP Connected");
+      const info = await transporter.sendMail(mailOptions);
+      console.log("Email sent successfully:", info.response);
+    } catch (err) {
+      console.error("Email sending failed:", err);
+      return res.status(400).json({success:false})
+    }
+//     try {
+//     console.log("Trying to connect to SMTP...");
+//     await transporter.verify();
+//     console.log("SMTP Connected");
+// } catch (err) {
+//     console.error("VERIFY ERROR:");
+//     console.error(err);
+// }
     console.log('======================================================\n');
 
     res.status(201).json({
