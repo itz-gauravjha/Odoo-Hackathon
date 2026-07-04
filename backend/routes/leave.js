@@ -9,8 +9,8 @@ const getDatesInRange = (startDate, endDate) => {
   let current = new Date(startDate);
   const end = new Date(endDate);
   
-  current.setHours(0,0,0,0);
-  end.setHours(0,0,0,0);
+  current.setHours(12,0,0,0);
+  end.setHours(12,0,0,0);
 
   while (current <= end) {
     const year = current.getFullYear();
