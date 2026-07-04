@@ -7,7 +7,7 @@ const User = require('./models/User');
 const Attendance = require('./models/Attendance');
 const LeaveRequest = require('./models/LeaveRequest');
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/hrms';
+const MONGO_URI = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/hrms';
 
 // Helpers to get relative date strings YYYY-MM-DD
 function getDateOffset(offsetDays) {

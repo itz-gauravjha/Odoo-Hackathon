@@ -65,6 +65,8 @@ const generateLoginId = async (name, companyName) => {
 
 // @route   POST /api/auth/signup
 router.post('/signup', async (req, res) => {
+  const host = req.get('host');
+  const protocol = req.get('x-forwarded-proto') || req.protocol || 'http';
   try {
     const { name, email, password, role, companyName, companyLogo } = req.body;
 
@@ -121,7 +123,7 @@ router.post('/signup', async (req, res) => {
             </div>
             <p>Or, click the button below to verify automatically:</p>
             <div style="text-align: center; margin: 25px 0;">
-              <a href="http://127.0.0.1:3000/api/auth/verify?token=${otp}" style="background-color: #6366f1; color: white; padding: 10px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Verify Email Address</a>
+              <a href="${protocol}://${host}/api/auth/verify?token=${otp}" style="background-color: #6366f1; color: white; padding: 10px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Verify Email Address</a>
             </div>
             <p style="font-size: 11px; color: #64748b; text-align: center; margin-top: 20px;">This OTP will expire shortly. If you did not request this, please ignore this email.</p>
           </div>
@@ -134,7 +136,7 @@ router.post('/signup', async (req, res) => {
       console.error('[SMTP] Failed to send verification email:', mailErr);
     }
 
-    const verifyLink = `http://127.0.0.1:3000/api/auth/verify?token=${otp}`;
+    const verifyLink = `${protocol}://${host}/api/auth/verify?token=${otp}`;
     console.log('\n======================================================');
     console.log(`NEW USER SIGNUP: ${name} (${role})`);
     console.log(`GENERATED LOGIN ID: ${loginId}`);
