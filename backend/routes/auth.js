@@ -6,10 +6,15 @@ const nodemailer = require('nodemailer');
 const User = require('../models/User');
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true, // true for port 465 (SSL/TLS)
   auth: {
     user: process.env.SMTP_USER || process.env.EMAIL_USER,
     pass: process.env.SMTP_PASS || process.env.EMAIL_PASS
+  },
+  tls: {
+    rejectUnauthorized: false // avoids SSL handshake errors on cloud providers
   }
 });
 
@@ -108,10 +113,12 @@ router.post('/signup', async (req, res) => {
     await newUser.save();
 
     // Send email in the background (non-blocking) so the user gets an instant signup response
+    const senderEmail = process.env.SMTP_USER || process.env.EMAIL_USER;
     const mailOptions = {
-      from: `"HRMS Portal" <${process.env.SMTP_USER || process.env.EMAIL_USER}>`,
+      from: `"HRMS Portal" <${senderEmail}>`,
       to: email,
       subject: 'Verify Your HRMS Account - OTP Code',
+      text: `Hello ${name},\n\nYour HRMS account verification code is: ${otp}\n\nYou can verify online at:\n${protocol}://${host}/api/auth/verify?token=${otp}\n\nIf you did not request this, please ignore this email.\n\nThank you,\nDelta HRMS Systems`,
       html: `
         <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #f8fafc;">
           <h2 style="color: #6366f1; text-align: center;">HRMS Verification Code</h2>
