@@ -23,8 +23,8 @@ const isPasswordSecure = (password) => {
 };
 
 const generateLoginId = async (name, companyName) => {
-  const coPrefix = companyName && companyName.trim().length >= 2 
-    ? companyName.trim().substring(0, 2).toUpperCase() 
+  const coPrefix = companyName && companyName.trim().length >= 2
+    ? companyName.trim().substring(0, 2).toUpperCase()
     : 'OI';
 
   const nameParts = name.trim().split(/\s+/);
@@ -72,21 +72,33 @@ const generateLoginId = async (name, companyName) => {
 router.post('/signup', async (req, res) => {
   const host = req.get('host');
   const protocol = req.get('x-forwarded-proto') || req.protocol || 'http';
+
+  console.log('\n--- [SIGNUP INITIALIZED] ---');
+  console.log('Incoming Payload:', {
+    name: req.body.name,
+    email: req.body.email,
+    role: req.body.role,
+    companyName: req.body.companyName
+  });
+
   try {
     const { name, email, password, role, companyName, companyLogo } = req.body;
 
     if (!name || !email || !password || !role) {
+      console.log('[SIGNUP FAILED]: Missing required fields');
       return res.status(400).json({ message: 'Please fill in all required fields' });
     }
 
     if (!isPasswordSecure(password)) {
-      return res.status(400).json({ 
-        message: 'Password must be at least 6 characters long and contain both letters and numbers' 
+      console.log('[SIGNUP FAILED]: Insecure password');
+      return res.status(400).json({
+        message: 'Password must be at least 6 characters long and contain both letters and numbers'
       });
     }
 
     let existingUser = await User.findOne({ email });
     if (existingUser) {
+      console.log(`[SIGNUP FAILED]: User with email ${email} already exists`);
       return res.status(400).json({ message: 'User with this email already exists' });
     }
 
@@ -96,6 +108,10 @@ router.post('/signup', async (req, res) => {
 
     // Generate a 6-digit verification OTP code
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    console.log('[SIGNUP DATA GENERATED]:');
+    console.log(`- Generated Login ID: ${loginId}`);
+    console.log(`- Generated OTP Code: ${otp}`);
 
     const newUser = new User({
       loginId,
@@ -110,7 +126,9 @@ router.post('/signup', async (req, res) => {
       verificationToken: otp
     });
 
+    console.log('[DATABASE]: Saving new unverified user...');
     await newUser.save();
+    console.log('[DATABASE]: User saved successfully.');
 
     // Send email in the background (non-blocking) so the user gets an instant signup response
     const senderEmail = process.env.SMTP_USER || process.env.EMAIL_USER;
@@ -136,20 +154,12 @@ router.post('/signup', async (req, res) => {
       `
     };
 
+    console.log(`[SMTP]: Starting background email send to ${email}...`);
     transporter.sendMail(mailOptions)
-      .then(() => console.log(`[SMTP] Verification email sent successfully to ${email}`))
-      .catch(mailErr => console.error('[SMTP] Failed to send verification email:', mailErr));
-
-    const verifyLink = `${protocol}://${host}/api/auth/verify?token=${otp}`;
-    console.log('\n======================================================');
-    console.log(`NEW USER SIGNUP: ${name} (${role})`);
-    console.log(`GENERATED LOGIN ID: ${loginId}`);
-    console.log(`OTP CODE: ${otp}`);
-    console.log(`VERIFICATION LINK: ${verifyLink}`);
     console.log('======================================================\n');
 
-    res.status(201).json({ 
-      success: true, 
+    res.status(201).json({
+      success: true,
       message: `Registration successful! A verification OTP code has been sent to ${email}.`,
       loginId
     });
@@ -279,7 +289,7 @@ router.post('/signin', async (req, res) => {
       return res.status(400).json({ message: 'Please provide Login ID and password' });
     }
 
-    const user = await User.findOne({ 
+    const user = await User.findOne({
       $or: [
         { loginId: loginId },
         { email: loginId.toLowerCase() }
@@ -290,7 +300,7 @@ router.post('/signin', async (req, res) => {
     }
 
     if (!user.isVerified) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         message: 'Account not verified. Please enter the OTP sent to your email to verify.',
         notVerified: true,
         email: user.email,
