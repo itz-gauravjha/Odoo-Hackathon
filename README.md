@@ -1,10 +1,10 @@
 # 🏢 HRMS — Human Resource Management System
 
-> A full-stack, production-ready Human Resource Management System built for the **Odoo Hackathon**. Features dual portals (Employee + HR Admin), real-time attendance tracking, leave management, payroll slips, email OTP verification, and one-click Render deployment.
+> A full-stack, production-ready Human Resource Management System built for the **Odoo Hackathon**. Features a unified React portal (Employee + HR Admin views), real-time attendance tracking, leave management, payroll slips, email OTP verification, Cloudinary image upload (via Multer), and one-click Render deployment.
 
 **🌐 Live Demo:** [odoo-hackathon-1wcv.onrender.com](https://odoo-hackathon-1wcv.onrender.com)  
 **👤 Employee Portal:** `/`  
-**🛡️ HR Admin Console:** `/admin/`
+**🛡️ HR Admin Console:** `/admin`
 
 ---
 
@@ -23,11 +23,11 @@
 
 ### 👤 Employee Portal
 - **Secure Login** — Sign in with Email or auto-generated Login ID (e.g. `OIJODO20260001`)
-- **Email OTP Verification** — Account activation via 6-digit OTP sent to registered email
+- **Email OTP Verification** — Account activation via 6-digit OTP sent to registered email (asynchronous non-blocking dispatch)
 - **Employee Directory** — View all colleagues with live presence indicators (🟢 Present / ✈️ On Leave / 🟡 Absent)
 - **Attendance Tracker** — One-click check-in & check-out with a visual monthly calendar
 - **Leave Requests** — Submit Paid / Sick / Unpaid leave with date range picker
-- **Profile Management** — Update personal details, contact info, and profile picture
+- **Profile Management** — Update personal details, contact info, and upload profile pictures securely hosted on Cloudinary
 - **Payroll Slip** — View monthly salary breakdown (Basic, HRA, Allowances, Deductions, Net Pay)
 - **View-Only Colleague Profiles** — Browse teammates' resumes, skills, certifications (read-only)
 
@@ -39,12 +39,14 @@
 - **Attendance Overview** — View check-in/out records across all employees
 - **Employee Detail Inspector** — Multi-tab profile editor (Resume, Private Info, Salary)
 
-### 🔒 Security
+### 🔒 Security & Performance
 - Session-based authentication with `express-session`
 - Password hashing with `bcryptjs`
 - Role-based route protection (`requireAuth`, `requireHR` middleware)
 - Secure HTTPS cookies (`sameSite: none`, `secure: true`) on production
-- Render reverse proxy support (`trust proxy: 1`)
+- Render reverse proxy support (`app.set('trust proxy', 1)`)
+- Snappy non-blocking SMTP dispatch in background
+- Cloudinary image hosting (port 465 SSL/TLS connection) to avoid database document bloat
 
 ---
 
@@ -60,42 +62,38 @@ Click any file to open it directly in the workspace:
       - 📄 [LeaveRequest.js](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/models/LeaveRequest.js) — Employee leave applications
     - 📂 **[routes](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/routes)** — API Controllers
       - 📄 [auth.js](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/routes/auth.js) — User signup, signin, OTP generation, and email alerts
-      - 📄 [employee.js](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/routes/employee.js) — Employee profiles CRUD & directories list
+      - 📄 [employee.js](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/routes/employee.js) — Employee profiles CRUD, directories list, and Cloudinary upload routes
       - 📄 [attendance.js](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/routes/attendance.js) — Clocking status and monthly calendars
       - 📄 [leave.js](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/routes/leave.js) — Leave requests processing and approvals
       - 📄 [payroll.js](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/routes/payroll.js) — Payslip builder backend
-    - 📂 **[middleware](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/middleware)** — Guards
+    - 📂 **[middleware](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/middleware)** — Guards & Upload
       - 📄 [auth.js](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/middleware/auth.js) — Authentication check & Role verification guards
+      - 📄 [upload.js](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/middleware/upload.js) — Multer memory storage & Cloudinary streaming middleware
     - 📄 [db.js](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/db.js) — Mongoose database connection controller with database name injection
     - 📄 [server.js](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/server.js) — Main backend entrypoint, static assets hosting, and proxy settings
     - 📄 [seed.js](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/backend/seed.js) — Local database seeder script
-  - 📂 **[frontend](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend)** — Employee Portal (React + Vite)
+  - 📂 **[frontend](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend)** — Unified Portal Client (React + Vite)
     - 📂 **[src/pages](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/pages)** — Views
       - 📄 [Login.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/pages/Login.jsx) — User account creation, signing in, and email confirmation
       - 📄 [Dashboard.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/pages/Dashboard.jsx) — Core user control panel
+      - 📄 [AdminDashboard.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/pages/AdminDashboard.jsx) — Integrated HR operations hub
     - 📂 **[src/components](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components)** — Components
       - 📄 [AttendanceCalendar.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/AttendanceCalendar.jsx) — Attendance logs calendar heatmap
       - 📄 [ClockPanel.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/ClockPanel.jsx) — Interactive clocking switch
       - 📄 [EmployeeDetailView.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/EmployeeDetailView.jsx) — Detail profile modal with view-only protection
+      - 📄 [AdminEmployeeDetailView.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/AdminEmployeeDetailView.jsx) — HR administration details & settings editor
       - 📄 [EmployeeDirectory.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/EmployeeDirectory.jsx) — List of team members with presence status indicators
       - 📄 [LeaveForm.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/LeaveForm.jsx) — Leave applications creator
       - 📄 [LeaveHistoryTable.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/LeaveHistoryTable.jsx) — Submitted requests log
       - 📄 [ProfileView.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/ProfileView.jsx) — Summary view of own details
       - 📄 [ProfileEditForm.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/ProfileEditForm.jsx) — Form to update profile details
       - 📄 [PayrollSlip.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/PayrollSlip.jsx) — Printable salary breakdown card
-  - 📂 **[admin](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin)** — HR Admin Console (React + Vite)
-    - 📂 **[src/pages](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin/src/pages)** — Views
-      - 📄 [AdminLogin.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin/src/pages/AdminLogin.jsx) — Secure gateway for HR users
-      - 📄 [AdminDashboard.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin/src/pages/AdminDashboard.jsx) — Full overview dashboard for HR operations
-    - 📂 **[src/components](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin/src/components)** — Controls
-      - 📄 [AttendanceGrid.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin/src/components/AttendanceGrid.jsx) — Real-time attendance grid for HR audit
-      - 📄 [EditEmployeeModal.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin/src/components/EditEmployeeModal.jsx) — Admin employee details config window
-      - 📄 [EmployeeDetailView.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin/src/components/EmployeeDetailView.jsx) — Multi-tab editor for profile, settings, and wage
-      - 📄 [EmployeeDirectory.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin/src/components/EmployeeDirectory.jsx) — Employee roster search
-      - 📄 [LeaveReviewTable.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin/src/components/LeaveReviewTable.jsx) — Action buttons to approve/reject requests
-      - 📄 [ManualAttendanceModal.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin/src/components/ManualAttendanceModal.jsx) — Tool to retroactively override attendance
-      - 📄 [PayrollRegistry.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin/src/components/PayrollRegistry.jsx) — Registry of payslips by employee
-      - 📄 [SalaryModal.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/admin/src/components/SalaryModal.jsx) — Quick editor for monthly payroll values
+      - 📄 [AttendanceGrid.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/AttendanceGrid.jsx) — Real-time attendance grid for HR audit
+      - 📄 [EditEmployeeModal.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/EditEmployeeModal.jsx) — Quick HR registry editor
+      - 📄 [LeaveReviewTable.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/LeaveReviewTable.jsx) — Table to review, comment on, and approve/reject leave requests
+      - 📄 [ManualAttendanceModal.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/ManualAttendanceModal.jsx) — Admin retroactive attendance marks tool
+      - 📄 [PayrollRegistry.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/PayrollRegistry.jsx) — Roster of payslips and wage grids
+      - 📄 [SalaryModal.jsx](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/frontend/src/components/SalaryModal.jsx) — Fast wage structures adjuster
   - 📄 [package.json](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/package.json) — Monorepo commands configuration
   - 📄 [render_deployment_guide.md](file:///c:/Users/Imran%20Hussain/Desktop/school%20management/render_deployment_guide.md) — Render deployment guide
 
@@ -105,12 +103,13 @@ Click any file to open it directly in the workspace:
 
 | Layer | Technology |
 |---|---|
-| **Frontend** | React 18, Vite, TailwindCSS, Lucide Icons |
-| **Backend** | Node.js, Express.js |
+| **Frontend** | React 18, React Router, Vite, TailwindCSS, Lucide Icons |
+| **Backend** | Node.js, Express.js, Multer |
 | **Database** | MongoDB Atlas (Mongoose ODM) |
+| **Cloud Storage** | Cloudinary |
 | **Auth** | express-session, bcryptjs |
 | **Email** | Nodemailer (Gmail SMTP) |
-| **Deployment** | Render (single service, dual Vite builds) |
+| **Deployment** | Render (single service, unified frontend build) |
 
 ---
 
@@ -120,6 +119,7 @@ Click any file to open it directly in the workspace:
 - Node.js v18+
 - MongoDB Atlas account (or local MongoDB)
 - Gmail account with App Password for SMTP
+- Cloudinary account
 
 ### 1. Clone the repository
 ```bash
@@ -137,6 +137,7 @@ SESSION_SECRET=your_secret_key_here
 NODE_ENV=development
 SMTP_USER=your_email@gmail.com
 SMTP_PASS=your_gmail_app_password
+CLOUDINARY_URL=cloudinary://<api_key>:<api_secret>@<cloud_name>
 ```
 
 > **Gmail App Password**: Go to Google Account → Security → 2-Step Verification → App Passwords → Generate one for "Mail".
@@ -150,24 +151,25 @@ npm install
 node backend/seed.js
 ```
 
-### 4. Run all three servers concurrently
+### 4. Run servers concurrently
 ```bash
 npm run dev
 ```
 
 This starts:
 - **Backend API** on `http://localhost:3000`
-- **Employee Portal** on `http://localhost:5173`
-- **HR Admin Console** on `http://localhost:5174`
+- **Unified Frontend Client** on `http://localhost:5173`
 
 ---
 
 ## 🔑 Demo Credentials
 
-| Portal | URL | Login | Password |
-|---|---|---|---|
-| Employee Portal | `http://localhost:5173` | `employee@company.com` or `EMP-001` | `password123` |
-| HR Admin Console | `http://localhost:5174` | `hr@company.com` or `HR-001` | `password123` |
+All logins are run via the unified login page on `http://localhost:5173`:
+
+| Role | Login ID or Email | Password |
+|---|---|---|
+| **Employee** | `employee@company.com` or `EMP-001` | `password123` |
+| **HR Manager** | `hr@company.com` or `HR-001` | `password123` |
 
 ---
 
@@ -204,18 +206,13 @@ OI + JODO + 2026 + 0001  →  OIJODO20260001
 | `SESSION_SECRET` | *(any strong random string)* |
 | `SMTP_USER` | `your_email@gmail.com` |
 | `SMTP_PASS` | `your_gmail_app_password` |
+| `CLOUDINARY_URL` | `cloudinary://...` |
 
 ### How production serving works
-The single Express server serves **both** React apps:
-- `https://your-app.onrender.com/` → Employee Portal (`frontend/dist`)
-- `https://your-app.onrender.com/admin/` → HR Admin Console (`admin/dist`)
-- `https://your-app.onrender.com/api/*` → REST API
-
-### Seed the live database
-```bash
-# Run from your local machine against the Atlas URI
-MONGODB_URI="mongodb+srv://..." node backend/seed.js
-```
+The single Express server compiles and serves the entire unified application statically:
+- `https://your-app.onrender.com/` ➜ Main Portal (`frontend/dist`)
+- `https://your-app.onrender.com/admin` ➜ HR Admin Portal (routed client-side)
+- `https://your-app.onrender.com/api/*` ➜ REST API
 
 ---
 
@@ -224,9 +221,9 @@ MONGODB_URI="mongodb+srv://..." node backend/seed.js
 ### Auth
 | Method | Endpoint | Description |
 |---|---|---|
-| POST | `/api/auth/signup` | Register new user (sends OTP email) |
+| POST | `/api/auth/signup` | Register new user (background SMTP dispatch) |
 | POST | `/api/auth/verify-otp` | Verify OTP and activate account |
-| POST | `/api/auth/signin` | Login with LoginID or Email |
+| POST | `/api/auth/signin` | Login (returns email/loginId on 401 unverified status to prompt OTP) |
 | POST | `/api/auth/signout` | Logout and destroy session |
 | GET | `/api/auth/status` | Check current session |
 
@@ -234,10 +231,12 @@ MONGODB_URI="mongodb+srv://..." node backend/seed.js
 | Method | Endpoint | Access | Description |
 |---|---|---|---|
 | GET | `/api/employee/profile` | Employee | Own profile |
-| PUT | `/api/employee/profile` | Employee | Update own profile |
+| PUT | `/api/employee/profile` | Employee | Update own profile (filters base64 to Cloudinary) |
 | GET | `/api/employee/list` | Employee | All employees with today's status |
-| GET | `/api/employee/:id` | HR | Specific employee |
-| PUT | `/api/employee/:id` | HR | Update any employee |
+| GET | `/api/employee/:id` | HR | Specific employee details |
+| PUT | `/api/employee/:id` | HR | Update employee details |
+| POST | `/api/employee/upload-avatar` | Employee | Upload profile picture (binary via Multer) |
+| POST | `/api/employee/:id/upload-avatar` | HR | Upload employee profile picture (binary via Multer) |
 
 ### Attendance
 | Method | Endpoint | Description |
@@ -253,8 +252,7 @@ MONGODB_URI="mongodb+srv://..." node backend/seed.js
 | POST | `/api/leave/apply` | Submit leave request |
 | GET | `/api/leave/my-requests` | Own leave history |
 | GET | `/api/leave/all` | All requests (HR only) |
-| PUT | `/api/leave/:id/approve` | Approve (HR only) |
-| PUT | `/api/leave/:id/reject` | Reject (HR only) |
+| POST | `/api/leave/approve/:id` | Review, comment and approve/reject leave (HR only) |
 
 ### Payroll
 | Method | Endpoint | Description |
@@ -265,8 +263,11 @@ MONGODB_URI="mongodb+srv://..." node backend/seed.js
 
 ## 🧩 Key Design Decisions
 
-### Dual Portal Architecture
-Two separate Vite apps (`frontend/` and `admin/`) share the same backend API. In production they are compiled into `frontend/dist` and `admin/dist` and served by a single Express server.
+### Unified Single Portal
+Instead of serving two distinct frontends on different ports (5173 & 5174), the HR Admin dashboard is merged as a protected Route (`/admin`) within the main frontend React code. Route access is guarded on both the frontend (client-side checks) and backend (session middleware).
+
+### Transparent Cloudinary Interception
+The backend inspects incoming profile picture data. If a base64 string (`data:image/...`) is passed, the server automatically uploads it to Cloudinary and replaces it with the Cloudinary URL. This preserves the original frontend logic while completely preventing database bloating.
 
 ### Session Cookies on HTTPS
 `express-session` is configured with:
@@ -276,13 +277,7 @@ cookie: {
   secure:   NODE_ENV === 'production'
 }
 ```
-Combined with `app.set('trust proxy', 1)` for Render's load balancer.
-
-### Auto DB Name Injection
-If `MONGODB_URI` omits the database name (common Render pattern), `db.js` automatically appends `/hrms`:
-```
-.net/?appName=Cluster0  →  .net/hrms?appName=Cluster0
-```
+Combined with `app.set('trust proxy', 1)` for Render's reverse proxy load balancer.
 
 ---
 
