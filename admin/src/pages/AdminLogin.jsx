@@ -102,7 +102,7 @@ export default function AdminLogin() {
               
               <form onSubmit={handleSignIn} className="mt-8 space-y-5">
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-semibold tracking-wider text-slate-400 uppercase">Admin Login ID</label>
+                  <label className="text-xs font-semibold tracking-wider text-slate-400 uppercase">Login ID / Email</label>
                   <div className="relative">
                     <Shield className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-500" />
                     <input 
@@ -110,7 +110,7 @@ export default function AdminLogin() {
                       value={loginId} 
                       onChange={e => setLoginId(e.target.value)}
                       className="w-full rounded-xl border border-white/5 bg-slate-900/60 py-3.5 pl-11 pr-4 text-sm text-white placeholder-slate-500 transition-all focus:border-indigo-500/50 focus:bg-slate-900/80 focus:outline-none focus:ring-4 focus:ring-indigo-500/10" 
-                      placeholder="HR-XXXXXX" 
+                      placeholder="HR-XXXXXX or hr@company.com" 
                       required 
                     />
                   </div>

@@ -20,7 +20,10 @@ router.get('/profile', requireAuth, async (req, res) => {
 // @route   PUT /api/employee/profile
 router.put('/profile', requireAuth, async (req, res) => {
   try {
-    const { phone, address, profilePicture } = req.body;
+    const { 
+      phone, address, profilePicture, 
+      about, loveJob, hobbies, skills, certifications, mobile 
+    } = req.body;
 
     const user = await User.findById(req.session.userId);
     if (!user) {
@@ -30,6 +33,14 @@ router.put('/profile', requireAuth, async (req, res) => {
     if (phone !== undefined) user.phone = phone;
     if (address !== undefined) user.address = address;
     if (profilePicture !== undefined) user.profilePicture = profilePicture;
+    
+    // Resume and private updates
+    if (about !== undefined) user.about = about;
+    if (loveJob !== undefined) user.loveJob = loveJob;
+    if (hobbies !== undefined) user.hobbies = hobbies;
+    if (skills !== undefined) user.skills = skills;
+    if (certifications !== undefined) user.certifications = certifications;
+    if (mobile !== undefined) user.mobile = mobile;
 
     await user.save();
 
@@ -41,7 +52,13 @@ router.put('/profile', requireAuth, async (req, res) => {
         name: user.name,
         phone: user.phone,
         address: user.address,
-        profilePicture: user.profilePicture
+        profilePicture: user.profilePicture,
+        about: user.about,
+        loveJob: user.loveJob,
+        hobbies: user.hobbies,
+        skills: user.skills,
+        certifications: user.certifications,
+        mobile: user.mobile
       }
     });
   } catch (error) {
@@ -115,6 +132,26 @@ router.put('/:id', requireAuth, requireHR, async (req, res) => {
     if (role) employee.role = role;
     if (jobTitle) employee.jobTitle = jobTitle;
     if (department) employee.department = department;
+
+    // Save resume info
+    if (req.body.about !== undefined) employee.about = req.body.about;
+    if (req.body.loveJob !== undefined) employee.loveJob = req.body.loveJob;
+    if (req.body.hobbies !== undefined) employee.hobbies = req.body.hobbies;
+    if (req.body.skills !== undefined) employee.skills = req.body.skills;
+    if (req.body.certifications !== undefined) employee.certifications = req.body.certifications;
+
+    // Save location / private details
+    if (req.body.mobile !== undefined) employee.mobile = req.body.mobile;
+    if (req.body.manager !== undefined) employee.manager = req.body.manager;
+    if (req.body.location !== undefined) employee.location = req.body.location;
+
+    // Save salary structures
+    if (req.body.monthlyWage !== undefined) employee.monthlyWage = Number(req.body.monthlyWage);
+    if (req.body.workingDaysPerWeek !== undefined) employee.workingDaysPerWeek = Number(req.body.workingDaysPerWeek);
+    if (req.body.breakTimeHours !== undefined) employee.breakTimeHours = Number(req.body.breakTimeHours);
+    if (req.body.pfRate !== undefined) employee.pfRate = Number(req.body.pfRate);
+    if (req.body.professionalTax !== undefined) employee.professionalTax = Number(req.body.professionalTax);
+    if (req.body.standardAllowance !== undefined) employee.standardAllowance = Number(req.body.standardAllowance);
 
     if (salaryStructure) {
       if (salaryStructure.basic !== undefined) employee.salaryStructure.basic = Number(salaryStructure.basic);

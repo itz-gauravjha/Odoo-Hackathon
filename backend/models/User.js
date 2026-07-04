@@ -87,6 +87,62 @@ const UserSchema = new mongoose.Schema({
       type: Number,
       default: 200
     }
+  },
+  about: {
+    type: String,
+    default: ''
+  },
+  loveJob: {
+    type: String,
+    default: ''
+  },
+  hobbies: {
+    type: String,
+    default: ''
+  },
+  skills: {
+    type: [String],
+    default: []
+  },
+  certifications: {
+    type: [String],
+    default: []
+  },
+  monthlyWage: {
+    type: Number,
+    default: 50000
+  },
+  workingDaysPerWeek: {
+    type: Number,
+    default: 5
+  },
+  breakTimeHours: {
+    type: Number,
+    default: 1
+  },
+  pfRate: {
+    type: Number,
+    default: 12
+  },
+  professionalTax: {
+    type: Number,
+    default: 200
+  },
+  standardAllowance: {
+    type: Number,
+    default: 4167
+  },
+  mobile: {
+    type: String,
+    default: ''
+  },
+  manager: {
+    type: String,
+    default: ''
+  },
+  location: {
+    type: String,
+    default: ''
   }
 }, {
   timestamps: true

@@ -10,6 +10,7 @@ import LeaveHistoryTable from '../components/LeaveHistoryTable';
 import ProfileView from '../components/ProfileView';
 import ProfileEditForm from '../components/ProfileEditForm';
 import PayrollSlip from '../components/PayrollSlip';
+import EmployeeDetailView from '../components/EmployeeDetailView';
 
 export default function Dashboard() {
   const { user, logout, showToast } = useApp();
@@ -17,6 +18,8 @@ export default function Dashboard() {
 
   const [activeTab, setActiveTab] = useState('tab-attendance');
   const [profileData, setProfileData] = useState(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   
   // Today's Checkin Record
   const [todayRecord, setTodayRecord] = useState(null);
@@ -265,13 +268,35 @@ export default function Dashboard() {
               Admin Console ➜
             </a>
           )}
-          <span className="flex items-center gap-2 rounded-full border border-white/5 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-300">
-            <span className="h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
-            {profileData?.name || 'Loading...'}
-          </span>
-          <button onClick={() => logout(navigate)} className="rounded-lg border border-white/5 bg-white/5 p-2 text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-all" title="Sign Out">
-            <LogOut className="h-4 w-4" />
-          </button>
+          <div className="relative">
+            <button 
+              onClick={() => setShowDropdown(!showDropdown)}
+              className="flex items-center gap-2 rounded-full border border-white/5 bg-white/5 p-1 pr-3 text-xs font-semibold text-slate-300 hover:bg-white/10 transition-all focus:outline-none"
+            >
+              <img 
+                src={profileData?.profilePicture || defaultAvatar} 
+                alt="Avatar" 
+                className="h-7 w-7 rounded-full object-cover bg-slate-900 border border-indigo-500/25" 
+              />
+              <span>{profileData?.name || 'User'}</span>
+            </button>
+            {showDropdown && (
+              <div className="absolute right-0 mt-2 w-48 rounded-xl border border-white/5 bg-slate-900/95 backdrop-blur-md p-1 shadow-xl z-50 animate-slide-in">
+                <button 
+                  onClick={() => { setShowDropdown(false); setShowProfileModal(true); }}
+                  className="w-full text-left rounded-lg px-4 py-2.5 text-xs font-semibold text-slate-300 hover:bg-white/5 hover:text-white transition-all"
+                >
+                  My Profile
+                </button>
+                <button 
+                  onClick={() => { setShowDropdown(false); logout(navigate); }}
+                  className="w-full text-left rounded-lg px-4 py-2.5 text-xs font-semibold text-red-400 hover:bg-red-500/10 transition-all border-t border-white/5 mt-1"
+                >
+                  Log Out
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
@@ -387,7 +412,20 @@ export default function Dashboard() {
           )}
         </main>
 
-      </div>
+      {showProfileModal && (
+        <EmployeeDetailView 
+          employee={profileData}
+          onClose={() => setShowProfileModal(false)}
+          defaultAvatar={defaultAvatar}
+          showToast={showToast}
+          isAdminView={false}
+          onSaveSuccess={() => {
+            fetchProfile();
+            setShowProfileModal(false);
+          }}
+        />
+      )}
+    </div>
     </div>
   );
 }

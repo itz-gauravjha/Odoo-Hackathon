@@ -5,6 +5,7 @@ import { Users, Calendar, Clock, DollarSign, LogOut } from 'lucide-react';
 
 import EmployeeDirectory from '../components/EmployeeDirectory';
 import EditEmployeeModal from '../components/EditEmployeeModal';
+import EmployeeDetailView from '../components/EmployeeDetailView';
 import AttendanceGrid from '../components/AttendanceGrid';
 import ManualAttendanceModal from '../components/ManualAttendanceModal';
 import LeaveReviewTable from '../components/LeaveReviewTable';
@@ -35,6 +36,7 @@ export default function AdminDashboard() {
   // Edit employee modal states
   const [showEditEmpModal, setShowEditEmpModal] = useState(false);
   const [selectedEmp, setSelectedEmp] = useState(null);
+  const [selectedDetailEmployee, setSelectedDetailEmployee] = useState(null);
   const [empName, setEmpName] = useState('');
   const [empEmail, setEmpEmail] = useState('');
   const [empEmpId, setEmpEmpId] = useState('');
@@ -298,7 +300,9 @@ export default function AdminDashboard() {
           {activeTab === 'tab-directory' && (
             <EmployeeDirectory 
               employees={employees} 
-              onEdit={triggerEdit} 
+              attendance={attendance}
+              leaves={leaves}
+              onSelectEmployee={setSelectedDetailEmployee} 
               defaultAvatar={defaultAvatar} 
             />
           )}
@@ -369,6 +373,20 @@ export default function AdminDashboard() {
           remarks={manualRemarks} setRemarks={setManualRemarks}
           onSubmit={handleManualAttendance}
           onClose={() => setShowManualModal(false)}
+        />
+      )}
+
+      {/* Detailed employee card view & configurations */}
+      {selectedDetailEmployee && (
+        <EmployeeDetailView 
+          employee={selectedDetailEmployee}
+          defaultAvatar={defaultAvatar}
+          showToast={showToast}
+          onClose={() => setSelectedDetailEmployee(null)}
+          onSaveSuccess={() => {
+            fetchEmployees();
+            setSelectedDetailEmployee(null);
+          }}
         />
       )}
     </div>
