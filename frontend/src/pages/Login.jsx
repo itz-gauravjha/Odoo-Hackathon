@@ -71,6 +71,7 @@ export default function Login() {
     try {
       const res = await fetch('/api/auth/signin', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ loginId: signinLoginId, password: signinPassword })
       });
@@ -147,6 +148,7 @@ export default function Login() {
     try {
       const res = await fetch('/api/auth/verify-otp', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: registeredEmail, otp: otpInput })
       });

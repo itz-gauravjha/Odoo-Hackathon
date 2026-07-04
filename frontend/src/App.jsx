@@ -31,7 +31,7 @@ export default function App() {
 
   const fetchUserStatus = async () => {
     try {
-      const res = await fetch('/api/auth/status');
+      const res = await fetch('/api/auth/status', { credentials: 'include' });
       const data = await res.json();
       if (data.isAuthenticated) {
         setUser(data.user);
@@ -51,7 +51,7 @@ export default function App() {
 
   const logout = async (navigate) => {
     try {
-      const res = await fetch('/api/auth/signout', { method: 'POST' });
+      const res = await fetch('/api/auth/signout', { method: 'POST', credentials: 'include' });
       if (res.ok) {
         setUser(null);
         showToast('Logged out successfully');
