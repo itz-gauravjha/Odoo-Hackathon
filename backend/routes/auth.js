@@ -6,16 +6,16 @@ const nodemailer = require('nodemailer');
 const User = require('../models/User');
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
+  host: "smtp.gmail.com",
   port: 587,
-  secure: true, // true for port 465 (SSL/TLS)
+  secure: false, // Must be false for port 587
   auth: {
     user: process.env.SMTP_USER || process.env.EMAIL_USER,
-    pass: process.env.SMTP_PASS || process.env.EMAIL_PASS
+    pass: process.env.SMTP_PASS || process.env.EMAIL_PASS,
   },
-  tls: {
-    rejectUnauthorized: false // avoids SSL handshake errors on cloud providers
-  }
+  connectionTimeout: 30000,
+  greetingTimeout: 30000,
+  socketTimeout: 30000,
 });
 
 const isPasswordSecure = (password) => {
