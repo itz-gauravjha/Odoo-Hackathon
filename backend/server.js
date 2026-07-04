@@ -18,7 +18,7 @@ connectDB();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-const MongoStore = require('connect-mongo');
+const { MongoStore } = require('connect-mongo');
 
 let mongoURI = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/hrms';
 if (mongoURI.includes('mongodb+srv') && !mongoURI.match(/\.net\/[a-zA-Z0-9]/)) {
