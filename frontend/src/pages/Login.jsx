@@ -16,6 +16,11 @@ export default function Login() {
   const [dbStatus, setDbStatus] = useState('connecting');
   const [isSignUp, setIsSignUp] = useState(false);
 
+  // Loading/Pending States
+  const [isSigningIn, setIsSigningIn] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+
   // Signin fields
   const [signinLoginId, setSigninLoginId] = useState('');
   const [signinPassword, setSigninPassword] = useState('');
@@ -62,6 +67,7 @@ export default function Login() {
 
   const handleSignIn = async (e) => {
     e.preventDefault();
+    setIsSigningIn(true);
     try {
       const res = await fetch('/api/auth/signin', {
         method: 'POST',
@@ -86,6 +92,8 @@ export default function Login() {
       setUser(data.user);
     } catch (err) {
       showToast(err.message, 'error');
+    } finally {
+      setIsSigningIn(false);
     }
   };
 
@@ -97,6 +105,7 @@ export default function Login() {
       return;
     }
 
+    setIsSubmitting(true);
     const role = signupIsHR ? 'HR' : 'Employee';
     const emailToRegister = signupEmail;
     try {
@@ -130,18 +139,17 @@ export default function Login() {
       setSignupCompanyName('');
       setSignupCompanyLogo('');
       setSignupIsHR(false);
-
-      if (data.verificationLinkDevOnly) {
-        setDevVerifyLink(data.verificationLinkDevOnly);
-        setShowDevVerify(true);
-      }
+      setShowDevVerify(true);
     } catch (err) {
       showToast(err.message, 'error');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleVerifyOtpSubmit = async (e) => {
     e.preventDefault();
+    setIsVerifyingOtp(true);
     try {
       const res = await fetch('/api/auth/verify-otp', {
         method: 'POST',
@@ -161,6 +169,8 @@ export default function Login() {
       setOtpInput('');
     } catch (err) {
       showToast(err.message, 'error');
+    } finally {
+      setIsVerifyingOtp(false);
     }
   };
 
@@ -219,8 +229,9 @@ export default function Login() {
                     <input 
                       type="text" 
                       value={signinLoginId} 
+                      disabled={isSigningIn}
                       onChange={e => setSigninLoginId(e.target.value)}
-                      className="w-full rounded-xl border border-white/5 bg-slate-900/60 py-3.5 pl-11 pr-4 text-sm text-white placeholder-slate-500 transition-all focus:border-indigo-500/50 focus:bg-slate-900/80 focus:outline-none focus:ring-4 focus:ring-indigo-500/10" 
+                      className="w-full rounded-xl border border-white/5 bg-slate-900/60 py-3.5 pl-11 pr-4 text-sm text-white placeholder-slate-500 transition-all focus:border-indigo-500/50 focus:bg-slate-900/80 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 disabled:opacity-50" 
                       placeholder="EMP-XXXXXX or HR-XXXXXX" 
                       required 
                     />
@@ -234,13 +245,15 @@ export default function Login() {
                     <input 
                       type={showSignInPwd ? "text" : "password"} 
                       value={signinPassword} 
+                      disabled={isSigningIn}
                       onChange={e => setSigninPassword(e.target.value)}
-                      className="w-full rounded-xl border border-white/5 bg-slate-900/60 py-3.5 pl-11 pr-11 text-sm text-white placeholder-slate-500 transition-all focus:border-indigo-500/50 focus:bg-slate-900/80 focus:outline-none focus:ring-4 focus:ring-indigo-500/10" 
+                      className="w-full rounded-xl border border-white/5 bg-slate-900/60 py-3.5 pl-11 pr-11 text-sm text-white placeholder-slate-500 transition-all focus:border-indigo-500/50 focus:bg-slate-900/80 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 disabled:opacity-50" 
                       placeholder="••••••••" 
                       required 
                     />
                     <button 
                       type="button" 
+                      disabled={isSigningIn}
                       onClick={() => setShowSignInPwd(!showSignInPwd)}
                       className="absolute right-3.5 top-3.5 text-slate-500 hover:text-slate-300"
                     >
@@ -249,8 +262,19 @@ export default function Login() {
                   </div>
                 </div>
 
-                <button type="submit" className="mt-4 w-full rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 py-3.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition-all hover:translate-y-[-1px] hover:shadow-indigo-500/35 active:translate-y-0">
-                  Sign In to Account
+                <button 
+                  type="submit" 
+                  disabled={isSigningIn}
+                  className="mt-4 w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 py-3.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition-all hover:translate-y-[-1px] hover:shadow-indigo-500/35 active:translate-y-0 disabled:opacity-60"
+                >
+                  {isSigningIn ? (
+                    <>
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      Signing In...
+                    </>
+                  ) : (
+                    'Sign In to Account'
+                  )}
                 </button>
               </form>
 
@@ -281,8 +305,9 @@ export default function Login() {
                     <input 
                       type="text" 
                       value={signupName} 
+                      disabled={isSubmitting}
                       onChange={e => setSignupName(e.target.value)}
-                      className="w-full rounded-lg border border-white/5 bg-slate-900/60 py-2 pl-8 pr-3 text-xs text-white placeholder-slate-500 focus:outline-none" 
+                      className="w-full rounded-lg border border-white/5 bg-slate-900/60 py-2 pl-8 pr-3 text-xs text-white placeholder-slate-500 focus:outline-none disabled:opacity-50" 
                       placeholder="Alex Carter" 
                       required 
                     />
@@ -296,8 +321,9 @@ export default function Login() {
                     <input 
                       type="email" 
                       value={signupEmail} 
+                      disabled={isSubmitting}
                       onChange={e => setSignupEmail(e.target.value)}
-                      className="w-full rounded-lg border border-white/5 bg-slate-900/60 py-2 pl-8 pr-3 text-xs text-white placeholder-slate-500 focus:outline-none" 
+                      className="w-full rounded-lg border border-white/5 bg-slate-900/60 py-2 pl-8 pr-3 text-xs text-white placeholder-slate-500 focus:outline-none disabled:opacity-50" 
                       placeholder="alex.carter@company.com" 
                       required 
                     />
@@ -311,8 +337,9 @@ export default function Login() {
                     <input 
                       type="text" 
                       value={signupCompanyName} 
+                      disabled={isSubmitting}
                       onChange={e => setSignupCompanyName(e.target.value)}
-                      className="w-full rounded-lg border border-white/5 bg-slate-900/60 py-2 pl-8 pr-3 text-xs text-white placeholder-slate-500 focus:outline-none" 
+                      className="w-full rounded-lg border border-white/5 bg-slate-900/60 py-2 pl-8 pr-3 text-xs text-white placeholder-slate-500 focus:outline-none disabled:opacity-50" 
                       placeholder="Innovate Tech" 
                     />
                   </div>
@@ -327,13 +354,15 @@ export default function Login() {
                       <input 
                         type={showSignUpPwd ? "text" : "password"} 
                         value={signupPassword} 
+                        disabled={isSubmitting}
                         onChange={e => setSignupPassword(e.target.value)}
-                        className="w-full rounded-lg border border-white/5 bg-slate-900/60 py-2 pl-8 pr-8 text-xs text-white placeholder-slate-500 focus:outline-none" 
+                        className="w-full rounded-lg border border-white/5 bg-slate-900/60 py-2 pl-8 pr-8 text-xs text-white placeholder-slate-500 focus:outline-none disabled:opacity-50" 
                         placeholder="••••••••" 
                         required 
                       />
                       <button 
                         type="button" 
+                        disabled={isSubmitting}
                         onClick={() => setShowSignUpPwd(!showSignUpPwd)}
                         className="absolute right-3 top-2.5 text-slate-500 hover:text-slate-300"
                       >
@@ -349,8 +378,9 @@ export default function Login() {
                       <input 
                         type={showSignUpPwd ? "text" : "password"} 
                         value={signupConfirmPassword} 
+                        disabled={isSubmitting}
                         onChange={e => setSignupConfirmPassword(e.target.value)}
-                        className="w-full rounded-lg border border-white/5 bg-slate-900/60 py-2 pl-8 pr-3 text-xs text-white placeholder-slate-500 focus:outline-none" 
+                        className="w-full rounded-lg border border-white/5 bg-slate-900/60 py-2 pl-8 pr-3 text-xs text-white placeholder-slate-500 focus:outline-none disabled:opacity-50" 
                         placeholder="••••••••" 
                         required 
                       />
@@ -372,6 +402,7 @@ export default function Login() {
                     <input 
                       type="checkbox" 
                       checked={signupIsHR} 
+                      disabled={isSubmitting}
                       onChange={e => setSignupIsHR(e.target.checked)} 
                       className="peer sr-only" 
                     />
@@ -382,15 +413,26 @@ export default function Login() {
                   </span>
                 </div>
 
-                <button type="submit" className="w-full rounded-xl border border-indigo-500/20 bg-indigo-500/5 py-2.5 text-xs font-semibold text-indigo-300 transition-all hover:bg-indigo-500/10 hover:border-indigo-500/30">
-                  Create New Account
+                <button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl border border-indigo-500/20 bg-indigo-500/5 py-2.5 text-xs font-semibold text-indigo-300 transition-all hover:bg-indigo-500/10 hover:border-indigo-500/30 disabled:opacity-60"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <span className="h-3 w-3 animate-spin rounded-full border border-indigo-400 border-t-transparent" />
+                      Creating Account & Sending OTP...
+                    </>
+                  ) : (
+                    'Create New Account'
+                  )}
                 </button>
               </form>
 
               <div className="mt-6 border-t border-white/5 pt-4 text-center">
                 <p className="text-xs text-slate-400">
                   Already have an account?{' '}
-                  <button type="button" onClick={() => setIsSignUp(false)} className="text-indigo-400 font-semibold hover:underline focus:outline-none">
+                  <button type="button" disabled={isSubmitting} onClick={() => setIsSignUp(false)} className="text-indigo-400 font-semibold hover:underline focus:outline-none">
                     Sign In
                   </button>
                 </p>
@@ -401,7 +443,7 @@ export default function Login() {
         </div>
       </main>
 
-      {/* Dev Verification & Generated Login ID Modal with OTP input */}
+      {/* Verification & OTP Input Modal */}
       {showDevVerify && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm">
           <div className="glass-panel w-full max-w-md">
@@ -423,15 +465,27 @@ export default function Login() {
                 <input 
                   type="text" 
                   value={otpInput}
+                  disabled={isVerifyingOtp}
                   onChange={e => setOtpInput(e.target.value)}
                   maxLength={6}
                   placeholder="e.g. 123456" 
-                  className="w-full text-center tracking-widest font-mono text-xl rounded-lg border border-white/5 bg-slate-900/60 py-2.5 text-white focus:outline-none" 
+                  className="w-full text-center tracking-widest font-mono text-xl rounded-lg border border-white/5 bg-slate-900/60 py-2.5 text-white focus:outline-none disabled:opacity-50" 
                   required
                 />
               </div>
-              <button type="submit" className="w-full rounded-xl bg-indigo-500 py-3 text-xs font-bold text-white shadow-md shadow-indigo-500/20 hover:bg-indigo-600 transition-all">
-                Verify OTP & Complete Signup
+              <button 
+                type="submit" 
+                disabled={isVerifyingOtp}
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-indigo-500 py-3 text-xs font-bold text-white shadow-md shadow-indigo-500/20 hover:bg-indigo-600 transition-all disabled:opacity-60"
+              >
+                {isVerifyingOtp ? (
+                  <>
+                    <span className="h-3 w-3 animate-spin rounded-full border border-white border-t-transparent" />
+                    Verifying Code...
+                  </>
+                ) : (
+                  'Verify OTP & Complete Signup'
+                )}
               </button>
             </form>
           </div>

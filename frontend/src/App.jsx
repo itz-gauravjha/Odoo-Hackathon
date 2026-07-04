@@ -1,11 +1,23 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import React, { useState, useEffect, createContext, useContext, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
+
+const Login = lazy(() => import('./pages/Login'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
 
 const AppContext = createContext(null);
 
 export const useApp = () => useContext(AppContext);
+
+function PageLoader() {
+  return (
+    <div className="flex h-screen w-screen items-center justify-center bg-slate-950 text-slate-400">
+      <div className="flex flex-col items-center gap-4">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"></div>
+        <p className="font-display font-medium tracking-wide text-xs text-indigo-400">Loading module workspace...</p>
+      </div>
+    </div>
+  );
+}
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -23,7 +35,6 @@ export default function App() {
       const data = await res.json();
       if (data.isAuthenticated) {
         if (data.user.role === 'HR') {
-          // HR Officer attempting employee portal access: redirect to port 5174
           showToast('HR Access detected. Redirecting to admin console...', 'info');
           setTimeout(() => {
             window.location.href = 'http://localhost:5174/';
@@ -59,33 +70,28 @@ export default function App() {
   };
 
   if (loading) {
-    return (
-      <div className="flex h-screen w-screen items-center justify-center bg-midnight text-slate-400">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"></div>
-          <p className="font-display font-medium tracking-wide">Loading Employee Workspace...</p>
-        </div>
-      </div>
-    );
+    return <PageLoader />;
   }
 
   return (
     <AppContext.Provider value={{ user, setUser, showToast, logout, fetchUserStatus }}>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route 
-            path="/dashboard" 
-            element={
-              user ? (
-                <Dashboard />
-              ) : (
-                <Navigate to="/" replace />
-              )
-            } 
-          />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route 
+              path="/dashboard" 
+              element={
+                user ? (
+                  <Dashboard />
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              } 
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
       </BrowserRouter>
 
       {/* Global Toast component */}

@@ -1,11 +1,23 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import AdminLogin from './pages/AdminLogin';
-import AdminDashboard from './pages/AdminDashboard';
+import React, { useState, useEffect, createContext, useContext, Suspense, lazy } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+
+const AdminLogin = lazy(() => import('./pages/AdminLogin'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 
 const AdminAppContext = createContext(null);
 
 export const useAdminApp = () => useContext(AdminAppContext);
+
+function PageLoader() {
+  return (
+    <div className="flex h-screen w-screen items-center justify-center bg-slate-950 text-slate-400">
+      <div className="flex flex-col items-center gap-4">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"></div>
+        <p className="font-display font-medium tracking-wide text-xs text-indigo-400">Loading Console workspace...</p>
+      </div>
+    </div>
+  );
+}
 
 export default function App() {
   const [admin, setAdmin] = useState(null);
@@ -25,7 +37,6 @@ export default function App() {
         if (data.user.role === 'HR') {
           setAdmin(data.user);
         } else {
-          // Employee trying to access Admin portal - redirect them to employee portal on port 5173!
           showToast('Access denied. Redirecting to employee portal...', 'error');
           setTimeout(() => {
             window.location.href = 'http://localhost:5173/';
@@ -59,33 +70,28 @@ export default function App() {
   };
 
   if (loading) {
-    return (
-      <div className="flex h-screen w-screen items-center justify-center bg-midnight text-slate-400">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"></div>
-          <p className="font-display font-medium tracking-wide">Loading HR Console...</p>
-        </div>
-      </div>
-    );
+    return <PageLoader />;
   }
 
   return (
     <AdminAppContext.Provider value={{ admin, setAdmin, showToast, logout, fetchAdminStatus }}>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<AdminLogin />} />
-          <Route 
-            path="/admin" 
-            element={
-              admin ? (
-                <AdminDashboard />
-              ) : (
-                <Navigate to="/" replace />
-              )
-            } 
-          />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/" element={<AdminLogin />} />
+            <Route 
+              path="/admin" 
+              element={
+                admin ? (
+                  <AdminDashboard />
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              } 
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
       </BrowserRouter>
 
       {/* Global Toast component */}
