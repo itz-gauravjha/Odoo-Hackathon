@@ -5,16 +5,18 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const User = require('../models/User');
 
- const transporter = nodemailer.createTransport({
-    host:"smtp.gmail.com",
-    service: "gmail",
-    secure:false,
-    port:465,
+const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
     auth: {
-      user:process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
     },
-  });
+    connectionTimeout: 30000,
+    greetingTimeout: 30000,
+    socketTimeout: 30000
+});
 
 const isPasswordSecure = (password) => {
   return password.length >= 6 && /[A-Za-z]/.test(password) && /[0-9]/.test(password);
@@ -154,6 +156,8 @@ router.post('/signup', async (req, res) => {
     };
 
     try {
+      await transporter.verify();
+      console.log("SMTP Connected");
       const info = await transporter.sendMail(mailOptions);
       console.log("Email sent successfully:", info.response);
     } catch (err) {
