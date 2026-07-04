@@ -97,6 +97,13 @@ router.get('/list', requireAuth, async (req, res) => {
     const employees = await User.find({}).select('-password').sort({ name: 1 }).lean();
     
     // Calculate dates for today range
+    // Calculate date for today local string
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const todayStr = `${year}-${month}-${day}`;
+
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     const todayEnd = new Date();
@@ -104,7 +111,7 @@ router.get('/list', requireAuth, async (req, res) => {
 
     // Fetch today's checkins and approved leaves
     const todayAttendances = await Attendance.find({
-      date: { $gte: todayStart, $lte: todayEnd }
+      date: todayStr
     });
 
     const todayLeaves = await LeaveRequest.find({
