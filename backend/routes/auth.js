@@ -11,8 +11,8 @@ const User = require('../models/User');
     secure:false,
     port:465,
     auth: {
-      user:"stackzyx@gmail.com",
-      pass: "ptac lldr xckz rzqy",
+      user:process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
     },
   });
 
@@ -68,6 +68,7 @@ const generateLoginId = async (name, companyName) => {
 
 // @route   POST /api/auth/signup
 router.post('/signup', async (req, res) => {
+  console.log(process.env.SMTP_USER,"\n",process.env.SMTP_PASS)
   const host = req.get('host');
   const protocol = req.get('x-forwarded-proto') || req.protocol || 'http';
 
@@ -131,7 +132,7 @@ router.post('/signup', async (req, res) => {
     // Send email in the background (non-blocking) so the user gets an instant signup response
     const senderEmail = process.env.SMTP_USER || process.env.EMAIL_USER;
     const mailOptions = {
-      from:"stackzyx@gmail.com",
+      from:process.env.SMTP_USER,
       to: email,
       subject: 'Verify Your HRMS Account - OTP Code',
       text: `Hello ${name},\n\nYour HRMS account verification code is: ${otp}\n\nYou can verify online at:\n${protocol}://${host}/api/auth/verify?token=${otp}\n\nIf you did not request this, please ignore this email.\n\nThank you,\nDelta HRMS Systems`,
