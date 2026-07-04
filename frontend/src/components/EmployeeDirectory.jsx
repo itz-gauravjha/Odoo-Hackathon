@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plane, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Plane } from 'lucide-react';
 
 export default function EmployeeDirectory({ employees, onSelectEmployee, defaultAvatar }) {
   

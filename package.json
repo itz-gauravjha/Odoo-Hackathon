@@ -10,7 +10,7 @@
     "admin": "npm run dev --prefix admin",
     "dev": "concurrently \"npm run backend\" \"npm run frontend\" \"npm run admin\"",
     "seed": "node backend/seed.js",
-    "build": "npm run build --prefix frontend && npm run build --prefix admin"
+    "build": "npm install --prefix frontend && npm install --prefix admin && npm run build --prefix frontend && npm run build --prefix admin"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

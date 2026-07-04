@@ -68,10 +68,50 @@ router.put('/profile', requireAuth, async (req, res) => {
 });
 
 // HR Admin routes
-router.get('/list', requireAuth, requireHR, async (req, res) => {
+router.get('/list', requireAuth, async (req, res) => {
   try {
-    const employees = await User.find({}).select('-password').sort({ name: 1 });
-    res.json(employees);
+    const User = require('../models/User');
+    const Attendance = require('../models/Attendance');
+    const Leave = require('../models/Leave');
+
+    const employees = await User.find({}).select('-password').sort({ name: 1 }).lean();
+    
+    // Calculate dates for today range
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    // Fetch today's checkins and approved leaves
+    const todayAttendances = await Attendance.find({
+      date: { $gte: todayStart, $lte: todayEnd }
+    });
+
+    const todayLeaves = await Leave.find({
+      status: 'Approved',
+      startDate: { $lte: todayEnd },
+      endDate: { $gte: todayStart }
+    });
+
+    // Map each employee with their computed status dot
+    const employeesWithStatus = employees.map(emp => {
+      const checkedIn = todayAttendances.some(att => att.employeeId.toString() === emp._id.toString());
+      if (checkedIn) {
+        emp.todayStatus = 'present';
+        return emp;
+      }
+
+      const onLeave = todayLeaves.some(lv => lv.employeeId.toString() === emp._id.toString());
+      if (onLeave) {
+        emp.todayStatus = 'leave';
+        return emp;
+      }
+
+      emp.todayStatus = 'absent';
+      return emp;
+    });
+
+    res.json(employeesWithStatus);
   } catch (error) {
     console.error('Error listing employees:', error);
     res.status(500).json({ message: 'Server error listing employees' });

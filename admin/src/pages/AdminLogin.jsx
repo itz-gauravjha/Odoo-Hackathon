@@ -81,7 +81,7 @@ export default function AdminLogin() {
             {dbStatus === 'online' ? 'Database Connected' :
              dbStatus === 'offline' ? 'Database Disconnected' : 'Server Disconnected'}
           </span>
-          <a href="http://localhost:5173/" className="text-xs font-bold text-indigo-400 hover:underline">Employee Portal ➜</a>
+          <a href={window.location.hostname === 'localhost' ? 'http://localhost:5173/' : '/'} className="text-xs font-bold text-indigo-400 hover:underline">Employee Portal ➜</a>
         </div>
       </header>
 

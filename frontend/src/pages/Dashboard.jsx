@@ -16,10 +16,12 @@ export default function Dashboard() {
   const { user, logout, showToast } = useApp();
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState('tab-attendance');
+  const [activeTab, setActiveTab] = useState('tab-employees');
   const [profileData, setProfileData] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [employees, setEmployees] = useState([]);
+  const [selectedDetailEmployee, setSelectedDetailEmployee] = useState(null);
   
   // Today's Checkin Record
   const [todayRecord, setTodayRecord] = useState(null);
@@ -50,7 +52,20 @@ export default function Dashboard() {
     fetchLogs();
     fetchLeaves();
     fetchPaySlip();
+    fetchEmployees();
   }, []);
+
+  const fetchEmployees = async () => {
+    try {
+      const res = await fetch('/api/employee/list');
+      if (res.ok) {
+        const data = await res.json();
+        setEmployees(data);
+      }
+    } catch (err) {
+      console.error('Error fetching employee list:', err);
+    }
+  };
 
   const fetchProfile = async () => {
     try {
@@ -257,18 +272,64 @@ export default function Dashboard() {
       <header className="flex items-center justify-between border-b border-white/5 bg-slate-950/80 px-8 py-4 backdrop-blur-md sticky top-0 z-50">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 font-extrabold text-sm shadow-md shadow-indigo-500/20">H</div>
-          <span className="font-display font-bold tracking-tight text-white">HRMS Employee Portal</span>
+          <span className="font-display font-bold tracking-tight text-white hidden md:inline-block">HRMS Employee Portal</span>
         </div>
+
+        {/* Center Navigation Tabs */}
+        <div className="flex items-center gap-1 bg-white/5 border border-white/5 rounded-xl p-1">
+          <button 
+            onClick={() => setActiveTab('tab-employees')}
+            className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              activeTab === 'tab-employees' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            Employees
+          </button>
+          <button 
+            onClick={() => setActiveTab('tab-attendance')}
+            className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              activeTab === 'tab-attendance' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            Attendance
+          </button>
+          <button 
+            onClick={() => setActiveTab('tab-leave')}
+            className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              activeTab === 'tab-leave' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            Time Off
+          </button>
+          <button 
+            onClick={() => setActiveTab('tab-payroll')}
+            className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              activeTab === 'tab-payroll' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            Payroll
+          </button>
+        </div>
+
         <div className="flex items-center gap-4">
           {profileData?.role === 'HR' && (
             <a 
-              href="http://localhost:5174/"
+              href={window.location.hostname === 'localhost' ? 'http://localhost:5174/' : '/admin/'}
               className="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-all flex items-center gap-1 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1.5 rounded-lg"
             >
               Admin Console ➜
             </a>
           )}
-          <div className="relative">
+          <div className="relative flex items-center gap-2">
+            {/* Status dot in header: Green if checked in, Red if checked out */}
+            <span 
+              className={`h-2.5 w-2.5 rounded-full shadow-lg ${
+                todayRecord && todayRecord.checkIn && !todayRecord.checkOut
+                  ? 'bg-emerald-500 shadow-emerald-500/30 animate-pulse'
+                  : 'bg-red-500 shadow-red-500/30'
+              }`} 
+              title={todayRecord && todayRecord.checkIn && !todayRecord.checkOut ? 'Checked In' : 'Checked Out'}
+            />
             <button 
               onClick={() => setShowDropdown(!showDropdown)}
               className="flex items-center gap-2 rounded-full border border-white/5 bg-white/5 p-1 pr-3 text-xs font-semibold text-slate-300 hover:bg-white/10 transition-all focus:outline-none"
@@ -325,6 +386,12 @@ export default function Dashboard() {
           </div>
 
           <nav className="glass-panel flex flex-col gap-1 p-2">
+            <button onClick={() => setActiveTab('tab-employees')} className={`flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-semibold tracking-wide transition-all ${
+              activeTab === 'tab-employees' ? 'bg-indigo-500/10 border-l-2 border-indigo-500 text-white' : 'text-slate-400 hover:bg-white/5 hover:text-white'
+            }`}>
+              <User className="h-4 w-4" />
+              Employee Directory
+            </button>
             <button onClick={() => setActiveTab('tab-attendance')} className={`flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-semibold tracking-wide transition-all ${
               activeTab === 'tab-attendance' ? 'bg-indigo-500/10 border-l-2 border-indigo-500 text-white' : 'text-slate-400 hover:bg-white/5 hover:text-white'
             }`}>
@@ -354,6 +421,14 @@ export default function Dashboard() {
 
         {/* Content area tabs */}
         <main className="min-w-0">
+          {activeTab === 'tab-employees' && (
+            <EmployeeDirectory 
+              employees={employees} 
+              onSelectEmployee={setSelectedDetailEmployee} 
+              defaultAvatar={defaultAvatar} 
+            />
+          )}
+
           {activeTab === 'tab-attendance' && (
             <div className="space-y-6">
               <ClockPanel 
@@ -423,6 +498,16 @@ export default function Dashboard() {
             fetchProfile();
             setShowProfileModal(false);
           }}
+        />
+      )}
+
+      {selectedDetailEmployee && (
+        <EmployeeDetailView 
+          employee={selectedDetailEmployee}
+          onClose={() => setSelectedDetailEmployee(null)}
+          defaultAvatar={defaultAvatar}
+          showToast={showToast}
+          isAdminView={false}
         />
       )}
     </div>
