@@ -68,8 +68,10 @@ app.use('/api/payroll', require('./routes/payroll'));
 // Production setup: serve React build folder statically if it exists
 const frontendBuildPath = path.join(__dirname, '..', 'frontend', 'dist');
 
-// Serve Employee & Admin Portal statically ONLY in production
-if (process.env.NODE_ENV === 'production') {
+const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true';
+
+// Serve Employee & Admin Portal statically ONLY in production/Render environments
+if (isProduction) {
   app.use(express.static(frontendBuildPath));
   
   app.get('*', (req, res) => {
