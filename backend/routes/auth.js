@@ -296,7 +296,8 @@ router.post('/signin', async (req, res) => {
         message: 'Account not verified. Please enter the OTP sent to your email to verify.',
         notVerified: true,
         email: user.email,
-        loginId: user.loginId
+        loginId: user.loginId,
+        otpDevOnly: user.verificationToken
       });
     }
 

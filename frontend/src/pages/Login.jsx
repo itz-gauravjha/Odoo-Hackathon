@@ -40,6 +40,7 @@ export default function Login() {
   const [generatedLoginId, setGeneratedLoginId] = useState('');
   const [registeredEmail, setRegisteredEmail] = useState('');
   const [otpInput, setOtpInput] = useState('');
+  const [devOtp, setDevOtp] = useState('');
 
   // Passwords toggles
   const [showSignInPwd, setShowSignInPwd] = useState(false);
@@ -81,6 +82,9 @@ export default function Login() {
         if (res.status === 401 && data.notVerified) {
           setRegisteredEmail(data.email);
           setGeneratedLoginId(data.loginId);
+          if (data.otpDevOnly) {
+            setDevOtp(data.otpDevOnly);
+          }
           setShowDevVerify(true);
           showToast(data.message, 'info');
           return;
@@ -132,6 +136,9 @@ export default function Login() {
       showToast(data.message, 'success');
       setGeneratedLoginId(data.loginId);
       setRegisteredEmail(emailToRegister);
+      if (data.otpDevOnly) {
+        setDevOtp(data.otpDevOnly);
+      }
 
       // Reset signup fields
       setSignupName('');
@@ -460,6 +467,13 @@ export default function Login() {
               <div className="font-display font-black text-2xl text-white tracking-widest mt-1 select-all">{generatedLoginId}</div>
               <p className="text-[10px] text-slate-400 mt-2 font-medium">Please enter the 6-digit OTP code sent to your email to verify.</p>
             </div>
+
+            {devOtp && (
+              <div className="mt-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-center">
+                <span className="text-[9px] font-bold text-amber-400 uppercase tracking-wider block">Demo / Fail-Safe Verification Code</span>
+                <div className="text-xs text-slate-300 mt-1 font-medium">If your email is blocked or delayed, enter this code: <strong className="text-white text-sm font-mono tracking-widest block mt-1">{devOtp}</strong></div>
+              </div>
+            )}
 
             {/* OTP Code Form */}
             <form onSubmit={handleVerifyOtpSubmit} className="mt-4 space-y-4">
