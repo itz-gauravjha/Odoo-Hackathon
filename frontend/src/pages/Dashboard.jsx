@@ -11,6 +11,7 @@ import ProfileView from '../components/ProfileView';
 import ProfileEditForm from '../components/ProfileEditForm';
 import PayrollSlip from '../components/PayrollSlip';
 import EmployeeDetailView from '../components/EmployeeDetailView';
+import EmployeeDirectory from '../components/EmployeeDirectory';
 
 export default function Dashboard() {
   const { user, logout, showToast } = useApp();

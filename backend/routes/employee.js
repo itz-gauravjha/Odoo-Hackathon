@@ -95,13 +95,13 @@ router.get('/list', requireAuth, async (req, res) => {
 
     // Map each employee with their computed status dot
     const employeesWithStatus = employees.map(emp => {
-      const checkedIn = todayAttendances.some(att => att.employeeId.toString() === emp._id.toString());
+      const checkedIn = todayAttendances.some(att => att.employee && att.employee.toString() === emp._id.toString());
       if (checkedIn) {
         emp.todayStatus = 'present';
         return emp;
       }
 
-      const onLeave = todayLeaves.some(lv => lv.employeeId.toString() === emp._id.toString());
+      const onLeave = todayLeaves.some(lv => lv.employee && lv.employee.toString() === emp._id.toString());
       if (onLeave) {
         emp.todayStatus = 'leave';
         return emp;
