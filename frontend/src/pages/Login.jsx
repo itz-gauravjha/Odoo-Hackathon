@@ -201,7 +201,7 @@ export default function Login() {
             {dbStatus === 'online' ? 'Database Online' :
              dbStatus === 'offline' ? 'Database Offline (Dev Mode)' : 'Server Offline'}
           </span>
-          <a href="http://localhost:5174/" className="text-xs font-bold text-indigo-400 hover:underline">HR Console ➜</a>
+          <a href={window.location.hostname === 'localhost' ? 'http://localhost:5174/' : '/admin/'} className="text-xs font-bold text-indigo-400 hover:underline">HR Console ➜</a>
         </div>
       </header>
 
