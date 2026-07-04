@@ -257,6 +257,14 @@ export default function Dashboard() {
           <span className="font-display font-bold tracking-tight text-white">HRMS Employee Portal</span>
         </div>
         <div className="flex items-center gap-4">
+          {profileData?.role === 'HR' && (
+            <a 
+              href="http://localhost:5174/"
+              className="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-all flex items-center gap-1 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1.5 rounded-lg"
+            >
+              Admin Console ➜
+            </a>
+          )}
           <span className="flex items-center gap-2 rounded-full border border-white/5 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-300">
             <span className="h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
             {profileData?.name || 'Loading...'}

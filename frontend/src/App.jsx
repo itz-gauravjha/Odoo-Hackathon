@@ -34,14 +34,7 @@ export default function App() {
       const res = await fetch('/api/auth/status');
       const data = await res.json();
       if (data.isAuthenticated) {
-        if (data.user.role === 'HR') {
-          showToast('HR Access detected. Redirecting to admin console...', 'info');
-          setTimeout(() => {
-            window.location.href = 'http://localhost:5174/';
-          }, 1500);
-        } else {
-          setUser(data.user);
-        }
+        setUser(data.user);
       } else {
         setUser(null);
       }

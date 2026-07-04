@@ -80,13 +80,7 @@ export default function Login() {
         throw new Error(data.message || 'Login failed');
       }
 
-      if (data.user.role === 'HR') {
-        showToast('HR Account detected. Redirecting to Admin app...', 'info');
-        setTimeout(() => {
-          window.location.href = 'http://localhost:5174/';
-        }, 1500);
-        return;
-      }
+
 
       showToast('Welcome back, ' + data.user.name, 'success');
       setUser(data.user);
