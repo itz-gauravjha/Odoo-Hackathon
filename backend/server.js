@@ -68,20 +68,35 @@ app.use('/api/payroll', require('./routes/payroll'));
 // Production setup: serve React build folder statically if it exists
 const frontendBuildPath = path.join(__dirname, '..', 'frontend', 'dist');
 
-// Serve Employee & Admin Portal statically under root /
-app.use(express.static(frontendBuildPath));
-
-// Fallback all client-side router paths to frontend index.html
-app.get('*', (req, res) => {
-  res.sendFile(path.join(frontendBuildPath, 'index.html'), (err) => {
-    if (err) {
-      res.status(200).json({ 
-        message: "HRMS Backend API is online.",
-        status: "Development Mode (Vite dev server handles client ports)"
-      });
-    }
+// Serve Employee & Admin Portal statically ONLY in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(frontendBuildPath));
+  
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(frontendBuildPath, 'index.html'));
   });
-});
+} else {
+  // Local Development Mode: Return a clean API status check page under root /
+  app.get('/', (req, res) => {
+    const dbState = mongoose.connection.readyState;
+    const dbStates = {
+      0: "Disconnected 🔴",
+      1: "Connected 🟢",
+      2: "Connecting 🟡",
+      3: "Disconnecting 🔴"
+    };
+
+    res.json({
+      success: true,
+      message: "HRMS Backend API is online.",
+      database: dbStates[dbState] || "Unknown status 🔴",
+      developmentDetails: {
+        backendPort: 3001,
+        frontendDevServer: "http://localhost:5173"
+      }
+    });
+  });
+}
 
 // Error handling
 app.use((err, req, res, next) => {
