@@ -18,15 +18,27 @@ connectDB();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Express Session Middleware
+const MongoStore = require('connect-mongo');
+
+let mongoURI = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/hrms';
+if (mongoURI.includes('mongodb+srv') && !mongoURI.match(/\.net\/[a-zA-Z0-9]/)) {
+  mongoURI = mongoURI.replace(/\.net\/?\?/, '.net/hrms?').replace(/\.net\/?$/, '.net/hrms');
+}
+
+// Express Session Middleware with MongoDB persistence store
 app.use(session({
   name: 'sid',
   secret: process.env.SESSION_SECRET || 'supersecretkeyhrms123',
   resave: false,
   saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: mongoURI,
+    collectionName: 'sessions',
+    ttl: 7 * 24 * 60 * 60 // 7 days
+  }),
   cookie: {
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    sameSite: 'lax', // Lax is highly robust and avoids third-party blocking in Chrome
     secure: process.env.NODE_ENV === 'production'
   }
 }));
