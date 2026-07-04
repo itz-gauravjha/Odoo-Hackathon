@@ -107,34 +107,31 @@ router.post('/signup', async (req, res) => {
 
     await newUser.save();
 
-    let emailSent = false;
-    try {
-      const mailOptions = {
-        from: `"HRMS Portal" <${process.env.EMAIL_USER}>`,
-        to: email,
-        subject: 'Verify Your HRMS Account - OTP Code',
-        html: `
-          <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #f8fafc;">
-            <h2 style="color: #6366f1; text-align: center;">HRMS Verification Code</h2>
-            <p>Hello <strong>${name}</strong>,</p>
-            <p>Thank you for registering at the HRMS Portal. Please use the following One-Time Password (OTP) to verify your account registration:</p>
-            <div style="background-color: #e0e7ff; border: 1px dashed #6366f1; border-radius: 8px; padding: 15px; text-align: center; margin: 20px 0;">
-              <span style="font-size: 28px; font-weight: bold; letter-spacing: 4px; color: #4f46e5;">${otp}</span>
-            </div>
-            <p>Or, click the button below to verify automatically:</p>
-            <div style="text-align: center; margin: 25px 0;">
-              <a href="${protocol}://${host}/api/auth/verify?token=${otp}" style="background-color: #6366f1; color: white; padding: 10px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Verify Email Address</a>
-            </div>
-            <p style="font-size: 11px; color: #64748b; text-align: center; margin-top: 20px;">This OTP will expire shortly. If you did not request this, please ignore this email.</p>
+    // Send email in the background (non-blocking) so the user gets an instant signup response
+    const mailOptions = {
+      from: `"HRMS Portal" <${process.env.SMTP_USER || process.env.EMAIL_USER}>`,
+      to: email,
+      subject: 'Verify Your HRMS Account - OTP Code',
+      html: `
+        <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #f8fafc;">
+          <h2 style="color: #6366f1; text-align: center;">HRMS Verification Code</h2>
+          <p>Hello <strong>${name}</strong>,</p>
+          <p>Thank you for registering at the HRMS Portal. Please use the following One-Time Password (OTP) to verify your account registration:</p>
+          <div style="background-color: #e0e7ff; border: 1px dashed #6366f1; border-radius: 8px; padding: 15px; text-align: center; margin: 20px 0;">
+            <span style="font-size: 28px; font-weight: bold; letter-spacing: 4px; color: #4f46e5;">${otp}</span>
           </div>
-        `
-      };
-      await transporter.sendMail(mailOptions);
-      emailSent = true;
-      console.log(`[SMTP] Verification email sent successfully to ${email}`);
-    } catch (mailErr) {
-      console.error('[SMTP] Failed to send verification email:', mailErr);
-    }
+          <p>Or, click the button below to verify automatically:</p>
+          <div style="text-align: center; margin: 25px 0;">
+            <a href="${protocol}://${host}/api/auth/verify?token=${otp}" style="background-color: #6366f1; color: white; padding: 10px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Verify Email Address</a>
+          </div>
+          <p style="font-size: 11px; color: #64748b; text-align: center; margin-top: 20px;">This OTP will expire shortly. If you did not request this, please ignore this email.</p>
+        </div>
+      `
+    };
+
+    transporter.sendMail(mailOptions)
+      .then(() => console.log(`[SMTP] Verification email sent successfully to ${email}`))
+      .catch(mailErr => console.error('[SMTP] Failed to send verification email:', mailErr));
 
     const verifyLink = `${protocol}://${host}/api/auth/verify?token=${otp}`;
     console.log('\n======================================================');
@@ -146,9 +143,7 @@ router.post('/signup', async (req, res) => {
 
     res.status(201).json({ 
       success: true, 
-      message: emailSent
-        ? `Registration successful! Verification OTP code has been sent to ${email}.`
-        : `Registration successful! OTP code: ${otp} (SMTP offline).`,
+      message: `Registration successful! A verification OTP code has been sent to ${email}.`,
       loginId,
       otpDevOnly: otp,
       verificationLinkDevOnly: verifyLink
@@ -175,6 +170,10 @@ router.get('/verify', async (req, res) => {
     user.isVerified = true;
     user.verificationToken = '';
     await user.save();
+
+    const protocol = req.secure ? 'https' : 'http';
+    const host = req.get('host');
+    const redirectUrl = `${protocol}://${host}/`;
 
     res.send(`
       <!DOCTYPE html>
@@ -227,7 +226,7 @@ router.get('/verify', async (req, res) => {
         <div class="card">
           <h1>Verification Successful!</h1>
           <p>Your HRMS account has been successfully verified. You can now close this tab or return to the application to sign in.</p>
-          <a href="http://localhost:5173/" class="btn">Proceed to Login</a>
+          <a href="${redirectUrl}" class="btn">Proceed to Login</a>
         </div>
       </body>
       </html>

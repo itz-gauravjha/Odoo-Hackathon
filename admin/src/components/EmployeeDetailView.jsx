@@ -141,6 +141,7 @@ export default function EmployeeDetailView({ employee, onClose, onSaveSuccess, d
 
       const res = await fetch(`/api/employee/${employee._id}`, {
         method: 'PUT',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });

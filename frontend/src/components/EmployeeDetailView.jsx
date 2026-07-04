@@ -75,6 +75,7 @@ export default function EmployeeDetailView({ employee, onClose, onSaveSuccess, d
       const endpoint = isAdminView ? `/api/employee/${employee._id}` : '/api/employee/profile';
       const res = await fetch(endpoint, {
         method: 'PUT',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });

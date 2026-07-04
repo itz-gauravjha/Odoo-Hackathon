@@ -70,7 +70,7 @@ export default function AdminDashboard() {
 
   const fetchEmployees = async () => {
     try {
-      const res = await fetch('/api/employee/list');
+      const res = await fetch('/api/employee/list', { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
         setEmployees(data);
@@ -82,7 +82,7 @@ export default function AdminDashboard() {
 
   const fetchAttendance = async () => {
     try {
-      const res = await fetch(`/api/attendance/all?date=${filterDate}`);
+      const res = await fetch(`/api/attendance/all?date=${filterDate}`, { credentials: 'include' });
       const data = await res.json();
       if (data.success) setAttendance(data.records);
     } catch (err) {
@@ -92,7 +92,7 @@ export default function AdminDashboard() {
 
   const fetchLeaves = async () => {
     try {
-      const res = await fetch('/api/leave/all');
+      const res = await fetch('/api/leave/all', { credentials: 'include' });
       const data = await res.json();
       if (data.success) setLeaves(data.requests);
     } catch (err) {
@@ -102,7 +102,7 @@ export default function AdminDashboard() {
 
   const fetchPayroll = async () => {
     try {
-      const res = await fetch('/api/payroll/all');
+      const res = await fetch('/api/payroll/all', { credentials: 'include' });
       const data = await res.json();
       if (data.success) setPayroll(data.payroll);
     } catch (err) {
@@ -115,6 +115,7 @@ export default function AdminDashboard() {
     try {
       const res = await fetch(`/api/employee/${selectedEmp._id}`, {
         method: 'PUT',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: empName,
@@ -142,6 +143,7 @@ export default function AdminDashboard() {
     try {
       const res = await fetch(`/api/payroll/update/${selectedSalaryEmp._id}`, {
         method: 'PUT',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           basic: salBasic,
@@ -164,8 +166,9 @@ export default function AdminDashboard() {
     e.preventDefault();
     try {
       const res = await fetch('/api/attendance/mark', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           employeeId: manualEmpId,
           date: manualDate,
@@ -191,6 +194,7 @@ export default function AdminDashboard() {
     try {
       const res = await fetch(`/api/leave/approve/${id}`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status, adminComments: comment })
       });
