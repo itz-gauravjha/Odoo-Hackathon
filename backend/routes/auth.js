@@ -5,18 +5,16 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const User = require('../models/User');
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, // Must be false for port 587
-  auth: {
-    user: process.env.SMTP_USER || process.env.EMAIL_USER,
-    pass: process.env.SMTP_PASS || process.env.EMAIL_PASS,
-  },
-  connectionTimeout: 30000,
-  greetingTimeout: 30000,
-  socketTimeout: 30000,
-});
+ const transporter = nodemailer.createTransport({
+    host:"smtp.gmail.com",
+    service: "gmail",
+    secure:false,
+    port:465,
+    auth: {
+      user:"stackzyx@gmail.com",
+      pass: "ptac lldr xckz rzqy",
+    },
+  });
 
 const isPasswordSecure = (password) => {
   return password.length >= 6 && /[A-Za-z]/.test(password) && /[0-9]/.test(password);
@@ -133,7 +131,7 @@ router.post('/signup', async (req, res) => {
     // Send email in the background (non-blocking) so the user gets an instant signup response
     const senderEmail = process.env.SMTP_USER || process.env.EMAIL_USER;
     const mailOptions = {
-      from: `"HRMS Portal" <${senderEmail}>`,
+      from:"stackzyx@gmail.com",
       to: email,
       subject: 'Verify Your HRMS Account - OTP Code',
       text: `Hello ${name},\n\nYour HRMS account verification code is: ${otp}\n\nYou can verify online at:\n${protocol}://${host}/api/auth/verify?token=${otp}\n\nIf you did not request this, please ignore this email.\n\nThank you,\nDelta HRMS Systems`,
@@ -159,6 +157,7 @@ router.post('/signup', async (req, res) => {
       console.log("Email sent successfully:", info.response);
     } catch (err) {
       console.error("Email sending failed:", err);
+      return res.status(400).json({success:false})
     }
     console.log('======================================================\n');
 
